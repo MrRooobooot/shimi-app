@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>آزمون تعاملی شیمی کنکور</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    /* Telegram theme with brand fallback */
+    --bg:      var(--tg-theme-bg-color, #0A1128);
+    --bg2:     var(--tg-theme-secondary-bg-color, #0F1B3D);
+    --text:    var(--tg-theme-text-color, #EAF2FF);
+    --hint:    var(--tg-theme-hint-color, #7C8DB5);
+    --btn:     var(--tg-theme-button-color, #00E5FF);
+    --btn-txt: var(--tg-theme-button-text-color, #06202B);
+    --accent:  #00E5FF;
+    --gold:    #F1C40F;
+    --ok:      #22C55E;
+    --bad:     #EF4444;
+    --line:    rgba(255,255,255,.10);
+    --card:    rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Vazirmatn",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:16px;line-height:1.6;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+    max-width:560px;margin:0 auto;
+    overflow-x:hidden;
+  }
+
+  /* ---------- header ---------- */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .logo{
+    width:38px;height:38px;border-radius:11px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--accent),#0EA5E9);
+    display:flex;align-items:center;justify-content:center;
+    font-size:19px;font-weight:900;color:#06202B;
+  }
+  .brand h1{font-size:15px;font-weight:800;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand p{font-size:11px;color:var(--hint);font-weight:600}
+  .timer{
+    flex:0 0 auto;font-variant-numeric:tabular-nums;
+    font-size:15px;font-weight:800;color:var(--accent);
+    background:rgba(0,229,255,.10);border:1px solid rgba(0,229,255,.35);
+    border-radius:999px;padding:5px 13px;min-width:62px;text-align:center;
+  }
+  .timer.warn{color:var(--gold);border-color:rgba(241,196,15,.45);background:rgba(241,196,15,.10)}
+
+  /* ---------- progress ---------- */
+  .bar{height:5px;background:var(--card);border-radius:999px;overflow:hidden;margin-bottom:18px}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));
+         border-radius:999px;transition:width .35s cubic-bezier(.4,0,.2,1)}
+
+  /* ---------- question ---------- */
+  .qno{font-size:11.5px;font-weight:800;color:var(--hint);letter-spacing:.4px;margin-bottom:7px}
+  .qtext{font-size:17.5px;font-weight:800;line-height:1.75;margin-bottom:6px}
+  .eq{
+    direction:ltr;unicode-bidi:isolate;text-align:center;
+    font-family:"Vazirmatn",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:16px;font-weight:800;letter-spacing:.2px;color:var(--accent);
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin:10px 0;overflow-x:auto;white-space:nowrap;
+  }
+
+  /* ---------- options ---------- */
+  .opts{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+  .opt{
+    display:flex;align-items:center;gap:11px;width:100%;text-align:right;
+    background:var(--card);border:1.5px solid var(--line);border-radius:13px;
+    padding:13px 15px;font:inherit;font-weight:700;font-size:15.5px;color:var(--text);
+    cursor:pointer;transition:border-color .18s,background .18s,transform .08s;
+  }
+  .opt:active{transform:scale(.985)}
+  .opt .k{
+    flex:0 0 auto;width:27px;height:27px;border-radius:8px;
+    background:rgba(255,255,255,.07);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:900;color:var(--hint);
+  }
+  .opt.correct{border-color:var(--ok);background:rgba(34,197,94,.13)}
+  .opt.correct .k{background:var(--ok);color:#04240F;border-color:var(--ok)}
+  .opt.wrong{border-color:var(--bad);background:rgba(239,68,68,.13)}
+  .opt.wrong .k{background:var(--bad);color:#2B0505;border-color:var(--bad)}
+  .opt[disabled]{cursor:default;opacity:.85}
+  .opt.correct[disabled],.opt.wrong[disabled]{opacity:1}
+
+  /* ---------- feedback ---------- */
+  .fb{
+    margin-top:16px;border-radius:13px;padding:14px 15px;
+    border:1.5px solid var(--line);background:var(--card);
+    animation:in .28s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  .fb h3{font-size:14px;font-weight:900;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .fb.ok h3{color:var(--ok)} .fb.no h3{color:var(--bad)}
+  .fb p{font-size:14.5px;color:var(--text);opacity:.93}
+  .fb .steps{
+    direction:ltr;unicode-bidi:isolate;text-align:left;
+    font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.9;
+    background:rgba(0,0,0,.22);border-radius:9px;padding:10px 12px;margin-top:10px;
+    color:var(--accent);overflow-x:auto;
+  }
+
+  /* ---------- buttons ---------- */
+  .cta{
+    display:block;width:100%;margin-top:16px;
+    background:var(--btn);color:var(--btn-txt);
+    border:0;border-radius:13px;padding:15px;
+    font:inherit;font-size:16px;font-weight:900;cursor:pointer;
+    transition:opacity .18s,transform .08s;
+  }
+  .cta:active{transform:scale(.985)}
+  .cta.ghost{background:transparent;color:var(--accent);border:1.5px solid rgba(0,229,255,.4)}
+  .cta[hidden]{display:none}
+
+  /* ---------- result ---------- */
+  .result{text-align:center;padding-top:14px;animation:in .35s cubic-bezier(.4,0,.2,1)}
+  .ring{position:relative;width:158px;height:158px;margin:6px auto 18px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .val{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;
+  }
+  .ring .val b{font-size:37px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+  .ring .val span{font-size:12px;color:var(--hint);font-weight:700}
+  .result h2{font-size:20px;font-weight:900;margin-bottom:7px}
+  .result .sub{font-size:14.5px;color:var(--hint);font-weight:600;margin-bottom:18px}
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:18px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px}
+  .stat b{display:block;font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+  .stat span{font-size:11px;color:var(--hint);font-weight:700}
+  .review{display:flex;flex-direction:column;gap:7px;text-align:right;margin-bottom:18px}
+  .rev{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+       border-radius:10px;padding:10px 12px;font-size:13.5px;font-weight:700}
+  .rev i{flex:0 0 auto;width:21px;height:21px;border-radius:6px;display:flex;align-items:center;
+         justify-content:center;font-size:12px;font-weight:900;font-style:normal}
+  .rev.y i{background:rgba(34,197,94,.2);color:var(--ok)}
+  .rev.n i{background:rgba(239,68,68,.2);color:var(--bad)}
+  .rev span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.92}
+
+  .foot{margin-top:22px;padding-top:13px;border-top:1px solid var(--line);
+        text-align:center;font-size:11.5px;color:var(--hint);font-weight:600}
+  .foot a{color:var(--accent);text-decoration:none;font-weight:800}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">
+    <div class="logo">⚗️</div>
+    <div>
+      <h1>آزمون تعاملی شیمی</h1>
+      <p>الهه محمددوست • رتبه ۷۸۸</p>
+    </div>
+  </div>
+  <div class="timer" id="timer">۶۰</div>
+</div>
+
+<div class="bar"><i id="bar"></i></div>
+
+<main id="app"></main>
+
+<div class="foot">
+  کانال شیمی کنکور — <a href="https://t.me/shimi_mohamaddost" id="chlink">@shimi_mohamaddost</a>
+</div>
+
+<script>
+/* ============================================================
+   بانک سؤال — برگرفته از محتوای اختصاصی کانال (متد کلینیکال)
+   ============================================================ */
+const QUESTIONS = [
+  {
+    q: "در یون فسفات (PO₄³⁻)، شمار پیوندهای اشتراکی و جفت‌الکترون‌های ناپیوندی به ترتیب کدام است؟",
+    eq: "PO₄³⁻",
+    opts: ["۴ و ۱۲", "۵ و ۱۲", "۴ و ۱۰", "۶ و ۸"],
+    ans: 0,
+    why: "در کنکور نظام جدید ملاک رسم ساختار، رسیدن به اکتت کامل است (نه گسترش لایه ظرفیت). فسفر ۴ پیوند یگانه می‌دهد و هر ۴ اکسیژن هشت‌تایی می‌شوند.",
+    steps: [
+      "نیاز اکتت:  5 × 8 = 40",
+      "ظرفیت:     5 + 4(6) + 3 = 32",
+      "پیوند:      (40 − 32) / 2 = 4",
+      "ناپیوندی:   (32 − 8) / 2 = 12 جفت"
+    ]
+  },
+  {
+    q: "در یون کربنات (CO₃²⁻) چند پیوند اشتراکی وجود دارد؟",
+    eq: "CO₃²⁻",
+    opts: ["۳", "۴", "۵", "۶"],
+    ans: 1,
+    why: "با متد ۵ ثانیه‌ای تفاضل اکتت و ظرفیت، بدون رسم ساختار به جواب می‌رسی.",
+    steps: [
+      "نیاز اکتت:  4 × 8 = 32",
+      "ظرفیت:     4 + 18 + 2 = 24",
+      "پیوند:      (32 − 24) / 2 = 4"
+    ]
+  },
+  {
+    q: "در فرایند سه‌مرحله‌ای تولید سولفوریک اسید از گوگرد، با ۶۴ گرم گوگرد (خلوص ۸۰٪) و بازده‌های ۵۰٪، ۸۰٪ و ۵۰٪، چند گرم سولفوریک اسید تولید می‌شود؟",
+    eq: "S ➔ SO₂ ➔ SO₃ ➔ H₂SO₄   (S=32 , H₂SO₄=98)",
+    opts: ["۱۹.۶ گرم", "۳۱.۳۶ گرم", "۷۸.۴ گرم", "۱۵.۶۸ گرم"],
+    ans: 1,
+    why: "با متد ردپای اتم مشترک، نیازی به نوشتن و موازنه سه معادله نیست. فقط اتم گوگرد را از اول تا آخر دنبال کن.",
+    steps: [
+      "مول گوگرد:  (64 × 0.8) / 32 = 1.6",
+      "بازده کل:   0.5 × 0.8 × 0.5 = 0.2",
+      "جرم محصول:  1.6 × 0.2 × 98 = 31.36 g"
+    ]
+  },
+  {
+    q: "کدام واکنش، گرماده (گرما آزادکننده) است؟",
+    eq: "CH₄(g) + 2O₂(g) ➔ CO₂(g) + 2H₂O(g) + Q",
+    opts: ["فتوسنتز", "تنفس سلولی", "برق‌کافت آب", "تجزیه کربنات کلسیم"],
+    ans: 1,
+    why: "تنفس سلولی و سوختن، گرماده‌اند (Q آزاد می‌شود). فتوسنتز، برق‌کافت و تجزیه، گرماگیرند.",
+    steps: [
+      "گرماده:    ΔH < 0   (تنفس، سوختن، خنثی‌شدن)",
+      "گرماگیر:   ΔH > 0   (فتوسنتز، برق‌کافت، تجزیه)"
+    ]
+  },
+  {
+    q: "در سلول گالوانی روی–مس (دانیل)، کدام فلز در آند اکسید می‌شود؟",
+    eq: "Zn(s) + Cu²⁺(aq) ➔ Zn²⁺(aq) + Cu(s)   E° = +1.10 V",
+    opts: ["مس", "روی", "هر دو", "هیچ‌کدام"],
+    ans: 1,
+    why: "در سلول گالوانی، آند قطب منفی است و اکسیداسیون در آن رخ می‌دهد. روی فعال‌تر است، پس اکسید می‌شود.",
+    steps: [
+      "آند (منفی):  Zn ➔ Zn²⁺ + 2e⁻   (اکسیداسیون)",
+      "کاتد (مثبت): Cu²⁺ + 2e⁻ ➔ Cu   (کاهش)"
+    ]
+  }
+];
+
+const TIME_PER_Q = 60;   // ثانیه
+const FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+const fa = n => String(n).replace(/\d/g, d => FA[+d]);
+
+/* ---------- Telegram SDK (اختیاری — لوکال هم کار می‌کند) ---------- */
+const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+if (TG) {
+  TG.ready();
+  TG.expand();
+  try { TG.setHeaderColor("secondary_bg_color"); } catch(e){}
+}
+const haptic = t => { if (TG && TG.HapticFeedback) { try { TG.HapticFeedback.impactOccurred(t); } catch(e){} } };
+
+/* ---------- state ---------- */
+let i = 0, score = 0, left = TIME_PER_Q, tick = null, answers = [];
+
+const el = id => document.getElementById(id);
+const app = el("app");
+
+function stopTimer(){ if (tick) { clearInterval(tick); tick = null; } }
+
+function setTimer(v){
+  el("timer").textContent = fa(v);
+  el("timer").classList.toggle("warn", v <= 10);
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[i];
+  left = TIME_PER_Q;
+  setTimer(left);
+  el("bar").style.width = ((i / QUESTIONS.length) * 100) + "%";
+
+  app.innerHTML = `
+    <div class="qno">سؤال ${fa(i+1)} از ${fa(QUESTIONS.length)}</div>
+    <div class="qtext">${q.q}</div>
+    ${q.eq ? `<div class="eq">${q.eq}</div>` : ""}
+    <div class="opts" id="opts">
+      ${q.opts.map((o,k)=>`
+        <button class="opt" data-k="${k}">
+          <span class="k">${fa(k+1)}</span><span>${o}</span>
+        </button>`).join("")}
+    </div>
+    <div id="fb"></div>
+    <button class="cta" id="next" hidden>سؤال بعدی</button>
+  `;
+
+  app.querySelectorAll(".opt").forEach(b =>
+    b.addEventListener("click", () => pick(+b.dataset.k)));
+
+  stopTimer();
+  tick = setInterval(() => {
+    left--;
+    setTimer(left);
+    if (left <= 0) { stopTimer(); pick(-1); }
+  }, 1000);
+}
+
+function pick(k){
+  stopTimer();
+  const q = QUESTIONS[i];
+  const ok = k === q.ans;
+  if (ok) score++;
+  answers.push({ i, k, ok });
+  haptic(ok ? "light" : "rigid");
+
+  app.querySelectorAll(".opt").forEach(b => {
+    const bk = +b.dataset.k;
+    b.disabled = true;
+    if (bk === q.ans) b.classList.add("correct");
+    else if (bk === k) b.classList.add("wrong");
+  });
+
+  el("fb").innerHTML = `
+    <div class="fb ${ok ? "ok" : "no"}">
+      <h3>${ok ? "✅ درست" : (k === -1 ? "⏰ زمان تمام شد" : "❌ نادرست")}</h3>
+      <p>${q.why}</p>
+      <div class="steps">${q.steps.join("<br>")}</div>
+    </div>`;
+
+  const nxt = el("next");
+  nxt.hidden = false;
+  nxt.textContent = (i === QUESTIONS.length - 1) ? "دیدن نتیجه" : "سؤال بعدی";
+  nxt.onclick = () => { i++; (i < QUESTIONS.length) ? renderQuestion() : renderResult(); };
+  nxt.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function renderResult(){
+  stopTimer();
+  el("bar").style.width = "100%";
+  el("timer").textContent = "—";
+
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  const C = 2 * Math.PI * 66;
+  const off = C - (pct / 100) * C;
+  const color = pct >= 80 ? "var(--ok)" : pct >= 50 ? "var(--gold)" : "var(--bad)";
+  const msg = pct === 100 ? "بی‌نقص! 🏆"
+            : pct >= 80 ? "عالی بود! 🔥"
+            : pct >= 50 ? "خوب، ولی جای پیشرفت داری 💪"
+            : "نیاز به مرور داری 📚";
+
+  const right = answers.filter(a => a.ok).length;
+  const wrong = answers.length - right;
+  const used = answers.reduce((s,a) => s + (TIME_PER_Q - Math.max(left,0)), 0);
+
+  app.innerHTML = `
+    <div class="result">
+      <div class="ring">
+        <svg width="158" height="158">
+          <circle cx="79" cy="79" r="66" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="11"/>
+          <circle cx="79" cy="79" r="66" fill="none" stroke="${color}" stroke-width="11"
+                  stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div class="val"><b style="color:${color}">${fa(pct)}٪</b><span>درصد</span></div>
+      </div>
+
+      <h2>${msg}</h2>
+      <div class="sub">${fa(right)} پاسخ درست از ${fa(QUESTIONS.length)} سؤال</div>
+
+      <div class="stats">
+        <div class="stat"><b style="color:var(--ok)">${fa(right)}</b><span>درست</span></div>
+        <div class="stat"><b style="color:var(--bad)">${fa(wrong)}</b><span>نادرست</span></div>
+        <div class="stat"><b>${fa(pct)}٪</b><span>درصد</span></div>
+      </div>
+
+      <div class="review">
+        ${answers.map((a,n) => `
+          <div class="rev ${a.ok ? "y" : "n"}">
+            <i>${a.ok ? "✓" : "✕"}</i>
+            <span>سؤال ${fa(n+1)} — ${QUESTIONS[a.i].q.slice(0,42)}…</span>
+          </div>`).join("")}
+      </div>
+
+      <button class="cta" id="again">🔄 آزمون مجدد</button>
+      <button class="cta ghost" id="share" style="margin-top:9px">📬 ثبت‌نام کلاس</button>
+    </div>`;
+
+  el("again").onclick = () => { i = 0; score = 0; answers = []; renderQuestion(); };
+  el("share").onclick = () => {
+    const url = "https://t.me/Elahe_md1383";
+    if (TG) { try { TG.openTelegramLink(url); return; } catch(e){} }
+    window.open(url, "_blank");
+  };
+  haptic("medium");
+}
+
+/* ---------- start ---------- */
+renderQuestion();
+</script>
+</body>
+</html>
