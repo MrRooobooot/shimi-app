@@ -192,8 +192,14 @@ const KEY = "shimi_planner_v1";
 
 /* ---------------- build week (Sat..Fri) ---------------- */
 const today = new Date();
-const satOff = (today.getDay() - 6 + 7) % 7;   // JS: Sun=0 … Sat=6
-const weekStart = new Date(today); weekStart.setDate(today.getDate() - satOff);
+const weekStart = new Date(today);
+if (today.getDay() === 4 || today.getDay() === 5) {
+  const satOff = (6 - today.getDay() + 7) % 7;
+  weekStart.setDate(today.getDate() + satOff);
+} else {
+  const satOff = (today.getDay() - 6 + 7) % 7;
+  weekStart.setDate(today.getDate() - satOff);
+}
 
 const WEEK = [];
 for (let i=0;i<7;i++){

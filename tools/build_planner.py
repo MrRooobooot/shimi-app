@@ -32,8 +32,11 @@ FA = "۰۱۲۳۴۵۶۷۸۹"
 def fa(s): return str(s).translate(str.maketrans("0123456789", FA))
 
 today = datetime.date.today()
-sat_off = (today.weekday() - 5) % 7
-start = today - datetime.timedelta(days=sat_off)
+if today.weekday() in (3, 4):  # Thu or Fri -> look ahead to upcoming Saturday (planning ahead)
+    start = today + datetime.timedelta(days=(5 - today.weekday()))
+else:
+    sat_off = (today.weekday() - 5) % 7
+    start = today - datetime.timedelta(days=sat_off)
 
 DAYS = []
 for i in range(7):
