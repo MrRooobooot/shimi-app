@@ -1,0 +1,173 @@
+[
+ {
+  "cls": "tenth",
+  "title": "شیمی دهم • هواکره، آب و فرآیندهای جوی",
+  "sub": "اوزون، باران اسیدی، سوختن و رسوب‌های مهم",
+  "items": [
+   {
+    "name": "تشکیل اوزون تروپوسفری",
+    "tag": "نور خورشید hν",
+    "eq": "NO₂(g) + O₂(g) <span class=\"arr\">→</span> NO(g) + O₃(g)"
+   },
+   {
+    "name": "شکست اوزون استراتوسفری",
+    "tag": "پرتو فرابنفش UV",
+    "eq": "O₃(g) + O(g) <span class=\"arr\">→</span> 2O₂(g) &nbsp;|&nbsp; O₃ <span class=\"arr\">→[UV]</span> O₂ + O"
+   },
+   {
+    "name": "اکسیداسیون نیتروژن در موتور",
+    "tag": "دمای بالا / جرقه",
+    "eq": "N₂(g) + O₂(g) <span class=\"arr\">→</span> 2NO(g) &nbsp;|&nbsp; 2NO + O₂ <span class=\"arr\">→</span> 2NO₂"
+   },
+   {
+    "name": "تشکیل اسید نیتریک در جو",
+    "tag": "باران اسیدی",
+    "eq": "2NO₂(g) + H₂O(l) <span class=\"arr\">→</span> HNO₂(aq) + HNO₃(aq)"
+   },
+   {
+    "name": "تشکیل اسید سولفوریک در جو",
+    "tag": "اکسید گوگرد",
+    "eq": "2SO₂(g) + O₂(g) <span class=\"arr\">→</span> 2SO₃(g) &nbsp;|&nbsp; SO₃ + H₂O <span class=\"arr\">→</span> H₂SO₄"
+   },
+   {
+    "name": "فتوسنتز در گیاهان سبز",
+    "tag": "گرماگیر / کلروفیل",
+    "eq": "6CO₂(g) + 6H₂O(l) <span class=\"arr\">→[نور]</span> C₆H₁₂O₆(aq) + 6O₂(g)"
+   },
+   {
+    "name": "تنفس سلولی و تجزیه قند",
+    "tag": "گرماده (Q+)",
+    "eq": "C₆H₁₂O₆(s) + 6O₂(g) <span class=\"arr\">→</span> 6CO₂(g) + 6H₂O(l) + Q"
+   },
+   {
+    "name": "سوختن کامل متان",
+    "tag": "اکسیژن کافی",
+    "eq": "CH₄(g) + 2O₂(g) <span class=\"arr\">→</span> CO₂(g) + 2H₂O(g) + Q"
+   },
+   {
+    "name": "سوختن ناقص متان",
+    "tag": "اکسیژن ناکافی",
+    "eq": "2CH₄(g) + 3O₂(g) <span class=\"arr\">→</span> 2CO(g) + 4H₂O(g)"
+   },
+   {
+    "name": "رسوب سفید نقره کلرید",
+    "tag": "شناسایی یون Cl⁻",
+    "eq": "Ag⁺(aq) + Cl⁻(aq) <span class=\"arr\">→</span> AgCl(s)↓"
+   }
+  ]
+ },
+ {
+  "cls": "eleventh",
+  "title": "شیمی یازدهم • متالورژی، سنتز صنعتی و مواد آلی",
+  "sub": "استخراج آهن، فرایند هابر، استرها و پلیمریزاسیون",
+  "items": [
+   {
+    "name": "تولید گاز کاهنده کوره بلند",
+    "tag": "کک + هوای داغ",
+    "eq": "C(s) + O₂(g) <span class=\"arr\">→</span> CO₂(g) &nbsp;|&nbsp; CO₂ + C <span class=\"arr\">→</span> 2CO(g)"
+   },
+   {
+    "name": "احیای کلی آهن در کوره بلند",
+    "tag": "دمای بالا Δ",
+    "eq": "Fe₂O₃(s) + 3CO(g) <span class=\"arr\">→[Δ]</span> 2Fe(l) + 3CO₂(g)"
+   },
+   {
+    "name": "احیای مرحله‌ای اکسیدهای آهن",
+    "tag": "با گاز کاهنده CO",
+    "eq": "Fe₂O₃ <span class=\"arr\">→</span> Fe₃O₄ <span class=\"arr\">→</span> FeO <span class=\"arr\">→</span> Fe(l)"
+   },
+   {
+    "name": "واکنش گرمازای ترمیت",
+    "tag": "جوشکاری ریل راه‌آهن",
+    "eq": "2Al(s) + Fe₂O₃(s) <span class=\"arr\">→</span> Al₂O₃(s) + 2Fe(l) + Q"
+   },
+   {
+    "name": "فرایند هابر (سنتز آمونیاک)",
+    "tag": "Fe, 450°C, 200atm",
+    "eq": "N₂(g) + 3H₂(g) <span class=\"arr\">⇌</span> 2NH₃(g) + 92 kJ"
+   },
+   {
+    "name": "هیدراتاسیون اتن (تولید اتانول)",
+    "tag": "کاتالیزور اسیدی",
+    "eq": "CH₂=CH₂(g) + H₂O(g) <span class=\"arr\">→[H₂SO₄]</span> CH₃CH₂OH(l)"
+   },
+   {
+    "name": "واکنش استری‌شدن",
+    "tag": "تولید استر و آب",
+    "eq": "R-COOH + R'-OH <span class=\"arr\">⇌[H⁺]</span> R-COO-R' + H₂O"
+   },
+   {
+    "name": "صابونی شدن (آبکافت بازی استر)",
+    "tag": "محیط قلیایی NaOH",
+    "eq": "R-COO-R' + NaOH <span class=\"arr\">→</span> R-COONa + R'-OH"
+   },
+   {
+    "name": "پلیمریزاسیون اتن (پلی‌اتن)",
+    "tag": "دما و فشار بالا",
+    "eq": "n CH₂=CH₂ <span class=\"arr\">→</span> -[-CH₂-CH₂-]ₙ-"
+   },
+   {
+    "name": "سنتز آسپرین در داروسازی",
+    "tag": "سالیسیلیک اسید",
+    "eq": "C₇H₆O₃ + C₄H₆O₃ <span class=\"arr\">→</span> C₉H₈O₄ + CH₃COOH"
+   }
+  ]
+ },
+ {
+  "cls": "twelfth",
+  "title": "شیمی دوازدهم • تعادل، اسید و باز، الکتروشیمی و فناوری",
+  "sub": "سلول‌های دانیل، برق‌کافت، فرایند هال و کاتالیزورها",
+  "items": [
+   {
+    "name": "خود‌یونش آب در دمای ۲۵°C",
+    "tag": "Kw = 10⁻¹⁴",
+    "eq": "2H₂O(l) <span class=\"arr\">⇌</span> H₃O⁺(aq) + OH⁻(aq)"
+   },
+   {
+    "name": "خنثی‌شدن اسید و باز قوی",
+    "tag": "معادله یونی خالص",
+    "eq": "H⁺(aq) + OH⁻(aq) <span class=\"arr\">→</span> H₂O(l) &nbsp;|&nbsp; ΔH &lt; 0"
+   },
+   {
+    "name": "سلول گالوانی روی - مس (دانیل)",
+    "tag": "E° = +1.10 V",
+    "eq": "Zn(s) + Cu²⁺(aq) <span class=\"arr\">→</span> Zn²⁺(aq) + Cu(s)"
+   },
+   {
+    "name": "برق‌کافت آب (تجزیه الکتریکی)",
+    "tag": "نسبت حجم ۲ به ۱",
+    "eq": "2H₂O(l) <span class=\"arr\">→[برق]</span> 2H₂(g) [کاتد] + O₂(g) [آند]"
+   },
+   {
+    "name": "برق‌کافت NaCl مذاب (سلول دانز)",
+    "tag": "تولید فلز Na",
+    "eq": "2NaCl(l) <span class=\"arr\">→[برق]</span> 2Na(l) [کاتد] + Cl₂(g) [آند]"
+   },
+   {
+    "name": "فرایند هال (تولید آلومینیم)",
+    "tag": "کریولیت ۹۶۰°C",
+    "eq": "2Al₂O₃(l) + 3C(s) <span class=\"arr\">→</span> 4Al(l) + 3CO₂(g)"
+   },
+   {
+    "name": "برق‌کافت MgCl₂ (استخراج Mg)",
+    "tag": "آب دریا",
+    "eq": "MgCl₂(l) <span class=\"arr\">→[برق]</span> Mg(l) [کاتد] + Cl₂(g) [آند]"
+   },
+   {
+    "name": "مبدل کاتالیستی (حذف آلاینده‌ها)",
+    "tag": "فلزات Pt/Rh",
+    "eq": "2CO(g) + 2NO(g) <span class=\"arr\">→[کاتالیزور]</span> 2CO₂(g) + N₂(g)"
+   },
+   {
+    "name": "اکسیداسیون هیدروکربن اگزوز",
+    "tag": "مبدل خودرو",
+    "eq": "CxHy + (x + y/4)O₂ <span class=\"arr\">→</span> xCO₂ + (y/2)H₂O"
+   },
+   {
+    "name": "اکسیداسیون HCl با MnO₂",
+    "tag": "تولید آزمایشگاهی Cl₂",
+    "eq": "MnO₂(s) + 4HCl(aq) <span class=\"arr\">→</span> MnCl₂(aq) + Cl₂(g) + 2H₂O(l)"
+   }
+  ]
+ }
+]

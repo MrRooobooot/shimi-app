@@ -3,7 +3,10 @@
 برگه طلایی — پلنر مطالعاتی هفتگی شیمی کنکور
 A4 portrait · print-friendly · anti-crop watermark · 1 page exactly
 """
-import subprocess, datetime, os, re
+import subprocess, datetime, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from brand import (logo_tile, watermark_svg, header_signature, footer_signature,
+                   CYAN, INK, MUTED, HAIR, audit_emoji_icons)
 
 # ---------------- Jalali conversion (no external deps) ----------------
 def g2j(gy, gm, gd):
@@ -101,17 +104,13 @@ def build_html():
 
   .wrap{{position:relative;z-index:5;display:flex;flex-direction:column;flex:1 1 auto;gap:5px;min-height:0}}
 
-  /* header */
+  /* header — متن فارسی: هرگز direction:ltr نگذار */
   .hd{{display:flex;justify-content:space-between;align-items:center;
-       border-bottom:2px solid #0284C7;padding-bottom:5px;flex:0 0 auto}}
+       border-bottom:2px solid {CYAN};padding-bottom:5px;flex:0 0 auto}}
   .hd-l{{display:flex;align-items:center;gap:8px}}
-  .logo{{width:30px;height:30px;border-radius:8px;background:#0284C7;color:#fff;
-         display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900}}
   .hd h1{{font-size:12.5pt;font-weight:900;line-height:1.15}}
-  .hd p{{font-size:7pt;color:#0284C7;font-weight:700}}
-  .hd-r{{text-align:left;direction:ltr}}
-  .hd-r b{{font-size:9pt;font-weight:900;display:block}}
-  .hd-r i{{font-size:6.8pt;color:#64748B;font-weight:700;font-style:normal}}
+  .hd p{{font-size:7pt;color:{CYAN};font-weight:700}}
+  .hd-r{{text-align:right}}
 
   /* goal strip */
   .goal{{display:flex;align-items:center;gap:6px;background:#F0F9FF;border:1px solid #BAE6FD;
@@ -128,7 +127,7 @@ def build_html():
                 border-color:#0284C7;font-size:7.6pt;width:12.6%;height:9mm;vertical-align:middle}}
   thead th.day b{{display:block;font-size:8pt;font-weight:900}}
   thead th.day i{{font-style:normal;font-size:6.4pt;opacity:.88;font-weight:600}}
-  thead th.corner{{background:#F8FAFC;border-color:#CBD5E1;width:11.8%}}
+  thead th.corner{{background:{CYAN};border-color:{CYAN};width:11.8%}}
   tbody th.part{{background:#F8FAFC;text-align:right;padding:4px 6px;width:11.8%;vertical-align:middle}}
   tbody th.part b{{display:block;font-size:7.6pt;font-weight:900;color:#0F172A}}
   tbody th.part i{{font-style:normal;font-size:6.4pt;color:#64748B;font-weight:600}}
@@ -161,31 +160,20 @@ def build_html():
   .ft .id{{direction:ltr;color:#0284C7;font-weight:800}}
 </style></head><body>
 
-<div class="wm">
-  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <defs><pattern id="p" width="300" height="150" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
-      <text x="12" y="42" font-family="Vazirmatn,sans-serif" font-size="10.5" font-weight="900" fill="#0284C7" opacity="0.055">الهه محمددوست • @shimi_mohamaddost</text>
-      <text x="140" y="112" font-family="Vazirmatn,sans-serif" font-size="9.5" font-weight="900" fill="#0284C7" opacity="0.055">رتبه ۷۸۸ • شیمی کنکور</text>
-    </pattern></defs>
-    <rect width="100%" height="100%" fill="url(#p)"/>
-  </svg>
-</div>
+{watermark_svg()}
 
 <div class="wrap">
 
   <div>
     <div class="hd">
       <div class="hd-l">
-        <div class="logo">⚗️</div>
+        {logo_tile(30, 8, CYAN)}
         <div>
           <h1>پلنر مطالعاتی هفتگی — شیمی کنکور</h1>
-          <p>هفته {week_label} · ۷۰٪ اختصاصی / ۳۰٪ عمومی · هر پارت ۷۵ تا ۹۰ دقیقه</p>
+          <p>هفته {week_label} · ۷۰٪ اختصاصی و ۳۰٪ عمومی · هر پارت ۷۵ تا ۹۰ دقیقه</p>
         </div>
       </div>
-      <div class="hd-r">
-        <b>الهه محمددوست</b>
-        <i>دانشجوی پزشکی مشهد • رتبه ۷۸۸</i>
-      </div>
+      <div class="hd-r">{header_signature("right")}</div>
     </div>
 
     <div class="goal">
@@ -232,8 +220,7 @@ def build_html():
   </div>
 
   <div class="ft">
-    <div>برگه طلایی رتبه برتر • کانال شیمی کنکور</div>
-    <div class="id">t.me/shimi_mohamaddost • @shimi_mohamaddost</div>
+    {footer_signature()}
   </div>
 
 </div>
@@ -245,8 +232,18 @@ def main():
     html_path = "/tmp/planner.html"
     pdf_path = f"{out_dir}/planner_weekly_chemistry.pdf"
 
+    html = build_html()
+
+    # گارد: هیچ ایموجی سیستمی نباید نقش آیکون رابط داشته باشد
+    leftover = audit_emoji_icons(html)
+    if leftover:
+        raise SystemExit(f"❌ ایموجی سیستمی در جایگاه آیکون: {leftover}")
+    # گارد: واترمارک اجباری است
+    if "shimi_wm" not in html:
+        raise SystemExit("❌ واترمارک در فایل نیست — انتشار ممنوع")
+
     with open(html_path, "w", encoding="utf-8") as f:
-        f.write(build_html())
+        f.write(html)
 
     subprocess.run([
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
