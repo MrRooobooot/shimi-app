@@ -157,14 +157,31 @@ export async function handler(event) {
       if (data.startsWith("pub_")) {
         const key = data.slice(4);
         if (isAssetKey(key)) {
+          // Preview the exact post in the GROUP first — channel publish requires an admin's
+          // explicit ✅ on the PREVIEW message (two-step, never direct publish)
+          await sendAsset(chatId, key);
+          await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
+            reply_markup: {
+              inline_keyboard: [[
+                {text: "✅ تایید نهایی و انتشار در کانال", callback_data: `pub2_${key}`},
+                {text: "❌ انصراف", callback_data: "noop"}
+              ]]
+            },
+            text: `📋 <b>پیش‌نمایش پست بالا</b>\n▫️ ${ASSETS[key].caption.slice(0, 80)}\n⚠️ با تایید نهایی، پست در کانال منتشر می‌شود.`});
+        }
+      } else if (data.startsWith("pub2_")) {
+        const key = data.slice(5);
+        if (isAssetKey(key)) {
           const r = await publishToChannel(key);
           if (r.ok) {
             await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
-              text: `✅ <b>${ASSETS[key].caption.slice(0, 60)}</b> با موفقیت در کانال منتشر شد!\n▫️ شناسه پیام: <code>#${r.result.message_id}</code>`});
+              text: `✅ <b>در کانال منتشر شد!</b>\n▫️ شناسه پیام: <code>#${r.result.message_id}</code>\n⚠️ قانون: پست بدون تایید گروه هرگز منتشر نمی‌شود.`});
           } else {
             await tg("sendMessage", {chat_id: chatId, text: `❌ خطا در انتشار: ${r.description || "unknown"}`});
           }
         }
+      } else if (data === "noop") {
+        await tg("sendMessage", {chat_id: chatId, text: "↩️ انصراف ثبت شد. فایل منتشر نشد."});
       } else if (data.startsWith("rej_")) {
         const key = data.slice(4);
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
