@@ -201,7 +201,8 @@ for (let i=0;i<7;i++){
   const [jy,jm,jd] = g2j(d.getFullYear(), d.getMonth()+1, d.getDate());
   const idx = (d.getDay()+6)%7;
   WEEK.push({ key: d.toISOString().slice(0,10), name: DAYN[idx], short: DAYS[idx],
-              date: fa(jd)+" "+JM[jm].slice(0,3), isToday: d.toDateString()===today.toDateString() });
+              date: fa(jd)+" "+JM[jm], dateShort: fa(jd),
+              isToday: d.toDateString()===today.toDateString() });
 }
 
 /* ---------------- state ---------------- */
@@ -245,7 +246,7 @@ function renderDays(){
   document.getElementById("days").innerHTML = WEEK.map(d => {
     const h = dayHours(d.key);
     return `<div class="day ${d.key===active?"on":""}" data-k="${d.key}" title="${d.name}">
-      <b>${d.short}</b><i>${d.date}</i>
+      <b>${d.short}</b><i>${d.dateShort}</i>
       <span class="h">${h?fa(Math.round(h*10)/10):"—"}</span>
     </div>`;
   }).join("");
