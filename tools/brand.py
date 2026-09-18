@@ -56,19 +56,37 @@ WATERMARK_ID = "shimi_wm"
 def watermark_svg(owner: str = "الهه محمددوست",
                   handle: str = "@shimi_mohamaddost",
                   second: str = "رتبه ۷۸۸ • شیمی کنکور",
-                  opacity: float = 0.055,
+                  opacity: float = 0.065,
                   angle: int = -24,
-                  tile_w: int = 300, tile_h: int = 150,
-                  color: str = CYAN) -> str:
-    """ماتریس واترمارک مورب سراسری — ضدکات و ضدسرقت."""
-    return f'''<div style="position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden">
+                  tile_w: int = 320, tile_h: int = 160,
+                  font_size: float = 11.0,
+                  color: str = CYAN,
+                  is_poster: bool = False) -> str:
+    """
+    ماتریس واترمارک مورب سراسری — ضدکات و ضدسرقت.
+    برای پوسترهای ۱۲۸۰ (is_poster=True)، فونت ۲۸ پیکسل با تایل ۵۸۰ تنظیم می‌شود تا خوانا و بازدارنده باشد.
+    """
+    if is_poster:
+        font_size = 28.0
+        fs_sec = 24.0
+        tile_w = 580
+        tile_h = 280
+        opacity = 0.075
+        y1 = 80
+        y2 = 210
+    else:
+        fs_sec = font_size * 0.9
+        y1 = int(tile_h * 0.28)
+        y2 = int(tile_h * 0.74)
+
+    return f'''<div style="position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden">
 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <pattern id="{WATERMARK_ID}" width="{tile_w}" height="{tile_h}"
              patternUnits="userSpaceOnUse" patternTransform="rotate({angle})">
-      <text x="12" y="42" font-family="Vazirmatn,sans-serif" font-size="10.5"
+      <text x="16" y="{y1}" font-family="Vazirmatn,sans-serif" font-size="{font_size}"
             font-weight="900" fill="{color}" opacity="{opacity}">{owner} • {handle}</text>
-      <text x="140" y="112" font-family="Vazirmatn,sans-serif" font-size="9.5"
+      <text x="{int(tile_w*0.35)}" y="{y2}" font-family="Vazirmatn,sans-serif" font-size="{fs_sec}"
             font-weight="900" fill="{color}" opacity="{opacity}">{second}</text>
     </pattern>
   </defs>

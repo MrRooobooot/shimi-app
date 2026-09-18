@@ -133,7 +133,7 @@ def build_html() -> str:
 <div class="poster">
 
   <div class="glow"></div>
-  {watermark_svg()}
+  {watermark_svg(is_poster=True)}
 
   <!-- header -->
   <div class="hd">
