@@ -534,7 +534,7 @@ const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp 
 if (TG) {
   TG.ready();
   TG.expand();
-  if (TG.isVersionAtLeast && TG.isVersionAtLeast('6.1')) { try { TG.setHeaderColor('secondary_bg_color'); } catch(e){} }
+  if (TG.isVersionAtLeast && TG.isVersionAtLeast('6.1')) { try { TG.setHeaderColor('#080D1F'); } catch(e){} try { TG.setBackgroundColor('#080D1F'); } catch(e){} } if (TG.isVersionAtLeast && TG.isVersionAtLeast('7.10')) { try { TG.setBottomBarColor('#080D1F'); } catch(e){} }
 }
 const haptic = t => { if (TG && TG.HapticFeedback) { try { TG.HapticFeedback.impactOccurred(t); } catch(e){} } };
 
