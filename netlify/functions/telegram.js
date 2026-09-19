@@ -53,6 +53,12 @@ const ASSETS = {
     type: "photo",
     caption: "🖼 پوستر آموزشی پیل دانیل — آناتومی آند و کاتد"
   },
+  shimidle: {
+    url: "https://shimi-chemistry-quiz.netlify.app/assets/shimidle_preview.png",
+    type: "photo",
+    caption: "🧩 شیمیدل — بازی حدس عنصر روزانه",
+    webapp: true
+  },
   banner_promo: {
     url: "https://shimi-chemistry-quiz.netlify.app/assets/banner_miniapp_promo.png",
     type: "photo",
@@ -70,6 +76,7 @@ const PUBLISH_CAPTIONS = {
   poster_isotopes: "⚡️ <b>متد کلینیکال: محاسبه ۳ ثانیه‌ای جرم اتمی میانگین!</b>\n───────────────\n🔹 <b>تکنیک ترازوی گشتاور:</b>\n<code>M̄ = M_سبک + (اختلاف جرم × درصد سنگین‌تر)</code>\n───────────────\n⚗️ شیمی کنکور | الهه محمددوست (رتبه ۷۸۸)\n🆔 " + LRM + "@shimi_mohamaddost\n\n#شیمی_دهم #ایزوتوپها #متد_کلینیکال",
   poster_molar: "⚡️ <b>متد کلینیکال: مقایسه سه واحد غلظتی — مولار، مولال و ppm</b>\n───────────────\n🔹 <b>جدول طلایی کسرها:</b>\n<code>M = n/V(L) | m = n/kg(solvent) | ppm = mg/L(soln)</code>\n───────────────\n⚗️ شیمی کنکور | الهه محمددوست (رتبه ۷۸۸)\n🆔 " + LRM + "@shimi_mohamaddost\n\n#شیمی_دهم #محلولها #متد_کلینیکال",
   poster_daniel: "⚡️ <b>پیل دانیل در یک نگاه — آند و کاتد را دیگر جابه‌جا نمی‌کنی!</b>\n───────────────\n🔹 <b>قاعده طلایی:</b> «آند همیشه جایی است که اکسیداسیون رخ می‌دهد»\n▫️ <b>آند:</b> قطب منفی، اکسیداسیون: <code>Zn ➔ Zn²⁺ + 2e⁻</code>\n▫️ <b>کاتد:</b> قطب مثبت، کاهش: <code>Cu²⁺ + 2e⁻ ➔ Cu</code>\n▫️ <b>E° = +1.10 V</b>\n───────────────\n⚗️ شیمی کنکور | الهه محمددوست (رتبه ۷۸۸)\n🆔 " + LRM + "@shimi_mohamaddost\n\n#شیمی_دوازدهم #پیل_دانیل #متد_کلینیکال",
+  shimidle: "🧩 <b>شیمیدل — بازی حدس عنصر روزانه، فقط در کانال شیمی کنکور!</b>\n───────────────\nبچه‌ها هر روز یک سرنخ از یک عنصر شیمیایی میدیم؛ شما حدس می‌زنین!\n\n🎯 <b>چطوری بازی کنیم؟</b>\n▫️ سرنخ اول سخت‌ترینه — هر جواب غلط، یک سرنخ جدید باز می‌کنه\n▫️ امتیاز و استریک روزانه‌ت ذخیره میشه\n▫️ نتیجه‌ت رو به دوستات چالش بفرست!\n───────────────\n👇 <b>همین امروز شروع کن!</b>\n───────────────\n⚗️ <b>شیمی کنکور | الهه محمددوست</b>\n🩺 <i>دانشجوی پزشکی مشهد • رتبه ۷۸۸</i>\n🆔 " + LRM + "@shimi_mohamaddost\n\n#شیمیدل #بازی_شیمی",
   banner_promo: "⚡️ <b>قابلیت جدید: مینی‌اپ هوشمند شیمی — آزمون و پلنر، داخل تلگرام!</b>\n───────────────\nبچه‌ها از امروز بدون نصب هیچ اپلیکیشنی، همه ابزارهای مطالعاتی‌تون داخل خود تلگرام در دسترستونه:\n\n📌 <b>امکانات نسخه تعاملی:</b>\n▫️ آزمون آنلاین استاندارد با تایمر و تحلیل گام‌به‌گام\n▫️ پلنر هفتگی هوشمند با ثبت ساعت و تست\n▫️ ذخیره خودکار روی گوشی\n───────────────\n👇 <b>همین حالا رایگان امتحان کن!</b>\n───────────────\n⚗️ <b>شیمی کنکور | الهه محمددوست</b>\n🩺 <i>دانشجوی پزشکی مشهد • رتبه ۷۸۸</i>\n🆔 " + LRM + "@shimi_mohamaddost\n\n#شیمی_کنکور #مینی_اپ #آزمون_آنلاین"
 };
 
@@ -103,14 +110,27 @@ async function sendAsset(chatId, key) {
 async function publishToChannel(key) {
   const a = ASSETS[key];
   if (!a) return {ok: false};
-  const method = a.type === "document" ? "sendDocument" : "sendPhoto";
+  if (a.webapp) {
+    const method = a.type === "document" ? "sendDocument" : "sendPhoto";
+    const payload = {
+      chat_id: CHANNEL_ID,
+      caption: PUBLISH_CAPTIONS[key] || a.caption,
+      parse_mode: "HTML",
+      reply_markup: {inline_keyboard: [[
+        {text: "🧩 ورود به شیمیدل (بازی روزانه) ↗", web_app: {url: "https://shimi-chemistry-quiz.netlify.app/shimidle.html"}}
+      ]]}
+    };
+    payload[method === "sendDocument" ? "document" : "photo"] = a.url;
+    return await tg(method, payload);
+  }
+  const method0 = a.type === "document" ? "sendDocument" : "sendPhoto";
   const payload = {
     chat_id: CHANNEL_ID,
     caption: PUBLISH_CAPTIONS[key] || a.caption,
     parse_mode: "HTML"
   };
-  payload[method === "sendDocument" ? "document" : "photo"] = a.url;
-  return await tg(method, payload);
+  payload[method0 === "sendDocument" ? "document" : "photo"] = a.url;
+  return await tg(method0, payload);
 }
 
 function isAssetKey(key) { return ASSETS.hasOwnProperty(key); }
