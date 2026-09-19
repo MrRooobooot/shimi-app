@@ -1,4 +1,4 @@
 /*
   X-Frame-Options: ALLOWALL
-  Content-Security-Policy: frame-ancestors https://web.telegram.org https://*.telegram.org
+  Content-Security-Policy: default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors https://web.telegram.org https://*.telegram.org
   Cache-Control: public, max-age=300
