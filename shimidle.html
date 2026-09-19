@@ -313,7 +313,7 @@
 
 <div class="guesses" id="guesses"></div>
 
-<button class="hint-btn" id="hintBtn">💡 مشاهده نکته و سرنخ بالینی دکتر محمددوست</button>
+<button class="hint-btn" id="hintBtn">💡 مشاهده نکته و سرنخ کلینیکال الهه محمددوست</button>
 <div class="hint-box" id="hintBox" style="display:none"></div>
 
 <div id="resultBox"></div>
@@ -635,7 +635,7 @@ document.getElementById("guessBtn").onclick = () => {
 document.getElementById("hintBtn").onclick = () => {
   const box = document.getElementById("hintBox");
   box.style.display = "block";
-  box.innerHTML = `🩺 <b>سرنخ بالینی دکتر محمددوست:</b> ${SECRET.fun.slice(0, 70)}... (دوره ${fa(SECRET.period)} یا گروه ${fa(SECRET.group)} را بررسی کن!)`;
+  box.innerHTML = `🩺 <b>سرنخ کلینیکال الهه محمددوست:</b> ${SECRET.fun.slice(0, 70)}... (دوره ${fa(SECRET.period)} یا گروه ${fa(SECRET.group)} را بررسی کن!)`;
   document.getElementById("hintBtn").style.display = "none";
   haptic("light");
 };
