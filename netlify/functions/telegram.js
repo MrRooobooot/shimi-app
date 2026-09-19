@@ -117,7 +117,7 @@ async function publishToChannel(key) {
       caption: PUBLISH_CAPTIONS[key] || a.caption,
       parse_mode: "HTML",
       reply_markup: {inline_keyboard: [[
-        {text: "🧩 ورود به شیمیدل (بازی روزانه) ↗", url: "https://shimi-chemistry-quiz.netlify.app/shimidle.html"}
+        {text: "🧩 ورود به شیمیدل پرو (بازی روزانه) ↗", url: "https://mrrooobooot.github.io/shimi-app/shimidle.html"}
       ]]}
     };
     payload[method === "sendDocument" ? "document" : "photo"] = a.url;
@@ -484,8 +484,8 @@ export async function handler(event) {
           text: "⚠️ همگام‌سازی هاب پین‌شده فعلاً فقط در ربات لوکال فعال است (نسخه ابری به‌زودی)."});
       } else if (text === "📅 مدیریت پلنر و آزمون" || text === "/planner") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
-          reply_markup: {inline_keyboard: [[{text: "🚀 باز کردن مینی‌اپ ↗", url: "https://shimi-chemistry-quiz.netlify.app"}]]},
-          text: "📅 <b>مدیریت پلنر مطالعاتی و مینی‌اپ</b>\n───────────────\n▫️ <b>بازه فعال:</b> هفته ۲۸ شهریور تا ۳ مهر\n▫️ <b>نسخه تعاملی وب:</b> <code>https://shimi-chemistry-quiz.netlify.app/planner.html\n▫️ <b>آزمون مینی‌اپ:</b> ۱۵ تست تفکیک‌شده در ۳ پایه</code>"});
+          reply_markup: {inline_keyboard: [[{text: "🚀 باز کردن مینی‌اپ ↗", url: "https://mrrooobooot.github.io/shimi-app/"}]]},
+          text: "📅 <b>مدیریت پلنر مطالعاتی و مینی‌اپ</b>\n───────────────\n▫️ <b>بازه فعال:</b> هفته ۲۸ شهریور تا ۳ مهر\n▫️ <b>نسخه تعاملی وب:</b> <code>https://mrrooobooot.github.io/shimi-app/planner.html</code>\n▫️ <b>آزمون مینی‌اپ:</b> ۱۵ تست تفکیک‌شده در ۳ پایه"});
       } else if (text === "⚙️ راهنما و ابزارها" || text === "/help") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", reply_markup: MAIN_KEYBOARD,
           text: "⚙️ <b>راهنمای پنل ابری ربات دستیار شیمی کنکور</b>\n───────────────\n▫️ <b>آمار:</b> وضعیت لحظه‌ای کانال\n▫️ <b>انتشار:</b> بررسی و ارسال پست‌های آماده به کانال\n▫️ <b>فایل‌ها:</b> دریافت مستقیم PDF و پوسترها\n▫️ <b>پلنر:</b> دسترسی سریع به ابزارهای هوشمند\n\n🆔 @nemathermesbot\n☁️ <b>اجرای ابری ۲۴/۷ روی Netlify</b>"});
