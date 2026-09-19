@@ -117,7 +117,7 @@ async function publishToChannel(key) {
       caption: PUBLISH_CAPTIONS[key] || a.caption,
       parse_mode: "HTML",
       reply_markup: {inline_keyboard: [[
-        {text: "🧩 ورود به شیمیدل (بازی روزانه) ↗", web_app: {url: "https://shimi-chemistry-quiz.netlify.app/shimidle.html"}}
+        {text: "🧩 ورود به شیمیدل (بازی روزانه) ↗", url: "https://shimi-chemistry-quiz.netlify.app/shimidle.html"}
       ]]}
     };
     payload[method === "sendDocument" ? "document" : "photo"] = a.url;
