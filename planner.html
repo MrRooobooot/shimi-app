@@ -276,6 +276,59 @@
   .sub::placeholder{ color: var(--hint); opacity: 0.7; font-size: 11.5px; }
   .part.done .sub{ text-decoration: line-through; opacity: 0.55; }
 
+    /* Unified App Footer */
+  .app-footer{
+    margin-top: 14px;
+    background: var(--card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 16px; padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    flex-wrap: wrap; flex: 0 0 auto;
+  }
+  .foot-brand{ display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .foot-logo{
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), #0284C7);
+    color: #FFF; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.35); flex: 0 0 auto;
+  }
+  .foot-info{ display: flex; flex-direction: column; min-width: 0; }
+  .foot-info b{ font-size: 12px; font-weight: 800; color: var(--text); }
+  .foot-info span{ font-size: 10px; color: var(--hint); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .foot-links{ display: flex; align-items: center; gap: 6px; }
+  .foot-link{
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(56, 189, 248, 0.10); border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 999px; padding: 4px 10px; text-decoration: none;
+    font-size: 11px; font-weight: 800; color: var(--accent);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .foot-link:hover{ background: rgba(56, 189, 248, 0.2); transform: translateY(-1px); }
+
+  /* Quick Subject Tags */
+  .quick-tags{
+    display: flex; gap: 5px; overflow-x: auto; padding: 2px 0 8px;
+    scrollbar-width: none; margin-bottom: 6px;
+  }
+  .quick-tags::-webkit-scrollbar{ display: none; }
+  .qtag{
+    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px; padding: 4px 9px; font-size: 11px; font-weight: 800;
+    color: var(--hint); cursor: pointer; white-space: nowrap; flex: 0 0 auto;
+    transition: all 0.2s;
+  }
+  .qtag:hover{ background: rgba(56, 189, 248, 0.12); border-color: var(--accent); color: var(--accent); }
+  .qtag:active{ transform: scale(0.94); }
+
+  .copy-btn{
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px; padding: 3px 8px; font: inherit; font-size: 11px; font-weight: 800;
+    color: var(--hint); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover{ color: var(--accent); border-color: var(--accent); }
+  .copy-btn:active{ transform: scale(0.95); }
+
   /* Footer / saved alert */
   .foot{
     text-align: center; font-size: 11px; color: var(--hint); font-weight: 600;
@@ -344,16 +397,52 @@
     <div class="panel">
       <div class="panel-hd">
         <h2 id="dayTitle">پارت‌های مطالعه امروز</h2>
-        <div class="sum">مجموع امروز: <b id="dayTotal">۰</b> ساعت</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="copy-btn" id="copyYesterdayBtn" title="کپی پارت‌های روز قبل به امروز">📋 کپی از دیروز</button>
+          <div class="sum">مجموع امروز: <b id="dayTotal">۰</b> ساعت</div>
+        </div>
+      </div>
+      <div class="quick-tags" id="quickTags">
+        <span class="qtag" data-tag="شیمی دهم">🧪 دهم</span>
+        <span class="qtag" data-tag="شیمی یازدهم">⚡️ یازدهم</span>
+        <span class="qtag" data-tag="شیمی دوازدهم">🔬 دوازدهم</span>
+        <span class="qtag" data-tag="مسائل استوکیومتری">⚖️ استوکیومتری</span>
+        <span class="qtag" data-tag="الکتروشیمی و پیل">🔋 الکتروشیمی</span>
+        <span class="qtag" data-tag="تست زمان‌دار">⏱ تست زمان‌دار</span>
+        <span class="qtag" data-tag="مرور و خلاصه">🔄 مرور</span>
       </div>
       <div class="parts-grid" id="parts"></div>
     </div>
   </div>
 </div>
 
-<div class="foot">
-  کانال شیمی کنکور — <a href="https://t.me/shimi_mohamaddost">@shimi_mohamaddost</a>
-</div>
+<footer class="app-footer">
+  <div class="foot-brand">
+    <div class="foot-logo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.2 2.6h5.6"/>
+        <path d="M10.4 2.6v6.1L5.9 16.8A2.6 2.6 0 0 0 8.2 20.8h7.6a2.6 2.6 0 0 0 2.3-4L13.6 8.7V2.6"/>
+        <path d="M7.6 15.2h8.8"/>
+        <circle cx="10.6" cy="17.6" r="0.9" fill="currentColor" stroke="none"/>
+        <circle cx="13.6" cy="18.4" r="0.7" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="foot-info">
+      <b>شیمی کنکور | الهه محمددوست</b>
+      <span>دانشجوی پزشکی مشهد • رتبه ۷۸۸ کنکور</span>
+    </div>
+  </div>
+  <div class="foot-links">
+    <a href="https://t.me/shimi_mohamaddost" target="_blank" class="foot-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      <span>کانال</span>
+    </a>
+    <a href="https://t.me/Elahe_md1383" target="_blank" class="foot-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>مشاوره</span>
+    </a>
+  </div>
+</footer>
 <div class="saved" id="saved">ذخیره شد ✓</div>
 
 <script>
@@ -607,6 +696,33 @@ const tInp = document.getElementById("targetInp");
 tInp.value = fa(state.target);
 bindNum(tInp, v => { state.target = Math.max(1, parseFloat(v) || 30); renderHero(); });
 render();
+
+// Quick tag insertion handler
+document.querySelectorAll(".qtag").forEach(tag => {
+  tag.addEventListener("click", () => {
+    const list = state.days[active];
+    // Find first empty part or append to first part
+    let targetPart = list.find(p => !p.sub);
+    if (!targetPart) targetPart = list[0];
+    targetPart.sub = targetPart.sub ? targetPart.sub + " + " + tag.dataset.tag : tag.dataset.tag;
+    if (!targetPart.hrs) targetPart.hrs = "1.5";
+    save(); render(); haptic("light");
+  });
+});
+
+// Copy yesterday plan handler
+document.getElementById("copyYesterdayBtn").addEventListener("click", () => {
+  const curIdx = WEEK.findIndex(d => d.key === active);
+  if (curIdx > 0) {
+    const prevKey = WEEK[curIdx - 1].key;
+    state.days[active] = state.days[prevKey].map(p => ({ sub: p.sub, hrs: p.hrs, done: false }));
+    save(); render(); haptic("medium");
+    fireConfetti();
+  } else {
+    haptic("rigid");
+  }
+});
+
 </script>
 </body>
 </html>

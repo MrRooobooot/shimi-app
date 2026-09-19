@@ -5,23 +5,22 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>شیمیدل — حدس عنصر روزانه</title>
+<title>شیمیدل پرو — بازی حدس عنصر جدول تناوبی</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
   :root{
-    --bg:      var(--tg-theme-bg-color, #080E21);
+    --bg:      var(--tg-theme-bg-color, #080D1F);
     --bg2:     var(--tg-theme-secondary-bg-color, #0F172A);
-    --text:    var(--tg-theme-text-color, #F1F5F9);
+    --text:    var(--tg-theme-text-color, #F8FAFC);
     --hint:    var(--tg-theme-hint-color, #94A3B8);
     --accent:  #38BDF8;
     --gold:    #F59E0B;
     --ok:      #22C55E;
     --bad:     #EF4444;
-    --card:    rgba(15, 23, 42, 0.72);
-    --card-border: rgba(255, 255, 255, 0.08);
-    --card-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-    --card2:   rgba(255, 255, 255, 0.08);
+    --card:    rgba(15, 23, 42, 0.75);
+    --card-border: rgba(255, 255, 255, 0.10);
+    --card-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    --card2:   rgba(255, 255, 255, 0.06);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{
@@ -33,192 +32,321 @@
     background-attachment: fixed;
     color: var(--text);
     font-family: "Vazirmatn", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 16px; line-height: 1.6;
-    padding: max(16px, env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
-    max-width: 560px; margin: 0 auto; overflow-x: hidden;
+    font-size: 15px; line-height: 1.5;
+    padding: max(14px, env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+    max-width: 680px; margin: 0 auto; min-height: 100vh;
   }
 
-  /* nav — glassmorphic */
+  /* Navigation */
+  .nav-bar{
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 14px;
+  }
   .nav{
-    display: flex; gap: 5px;
-    background: var(--card);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--card-glow);
-    border-radius: 16px; padding: 5px; margin-bottom: 18px;
+    display: flex; gap: 5px; background: var(--card);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 14px; padding: 4px;
   }
   .nav a{
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 10px 4px; border-radius: 12px; text-decoration: none; font-size: 12.5px;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 12.5px;
     font-weight: 800; color: var(--hint); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .nav a svg{ flex: 0 0 auto; opacity: 0.85; transition: transform 0.2s; }
+  .nav a svg{ flex: 0 0 auto; opacity: 0.85; }
   .nav a:active{ transform: scale(0.96); }
   .nav a.on{
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(14, 165, 233, 0.12));
-    border: 1px solid rgba(56, 189, 248, 0.4);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
-    color: var(--accent);
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(99, 102, 241, 0.16));
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+    color: #FFF;
   }
-  .nav a.on svg{ transform: scale(1.1); }
+  .nav a.on svg{ stroke: var(--accent); }
 
-  /* header */
-  .hd{ text-align: center; margin-bottom: 18px; }
-  .hd h1{ font-size: 21px; font-weight: 900; }
+  .hd{ display: flex; align-items: center; gap: 10px; }
+  .hd h1{ font-size: 17px; font-weight: 900; }
   .hd h1 span{ color: var(--accent); }
-  .hd p{ font-size: 12px; color: var(--hint); font-weight: 600; margin-top: 3px; }
+  .hd p{ font-size: 11px; color: var(--hint); font-weight: 600; }
 
-  .day-pill{
-    display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
-    background: rgba(56, 189, 248, 0.12); color: var(--accent);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
-    border-radius: 999px; padding: 6px 15px; font-size: 12.5px; font-weight: 800;
+  /* Info / Instructions Banner */
+  .hero-guide{
+    background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 18px; padding: 14px 16px; margin-bottom: 14px;
+    display: flex; flex-direction: column; gap: 8px;
   }
+  .guide-top{ display: flex; align-items: center; justify-content: space-between; }
+  .guide-title{ font-size: 13.5px; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+  .day-badge{
+    font-size: 11px; font-weight: 800; color: var(--gold);
+    background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 999px; padding: 3px 10px;
+  }
+  .legend{
+    display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--hint); font-weight: 700;
+  }
+  .leg-item{ display: inline-flex; align-items: center; gap: 4px; }
+  .leg-box{
+    width: 14px; height: 14px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 900; color: #FFF;
+  }
+  .leg-box.g{ background: var(--ok); }
+  .leg-box.y{ background: var(--gold); }
+  .leg-box.r{ background: var(--bad); }
 
-  /* clue cards */
-  .clues{ display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; }
-  .clue{
-    background: var(--card); backdrop-filter: blur(12px);
-    border-radius: 16px; padding: 14px 16px;
-    display: flex; align-items: center; gap: 12px;
-    opacity: 0.65; pointer-events: none; background: rgba(15, 23, 42, 0.55); border-color: rgba(255, 255, 255, 0.05); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--card-glow);
+  /* Search & Guess Input Box */
+  .input-card{
+    background: var(--card); backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 18px; padding: 12px 14px; margin-bottom: 14px;
+    position: relative;
   }
-  .clue.unlocked{ opacity: 1; pointer-events: auto; }
-  .clue.current{
-    border-color: rgba(56, 189, 248, 0.55);
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(15, 23, 42, 0.8));
-    box-shadow: 0 0 18px rgba(56, 189, 248, 0.2);
-    transform: scale(1.01);
+  .input-row{ display: flex; gap: 8px; }
+  .input-row input{
+    flex: 1; background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px;
+    padding: 11px 14px; color: var(--text); font: inherit; font-size: 14.5px; font-weight: 800;
+    text-align: right; transition: all 0.2s;
   }
-  .clue .n{
-    flex: 0 0 auto; width: 28px; height: 28px; border-radius: 8px;
-    background: var(--card2); display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 900; color: var(--hint); transition: all 0.2s;
-  }
-  .clue.current .n{ background: var(--accent); color: #06202B; }
-  .clue .txt{ flex: 1; font-size: 14.5px; font-weight: 700; line-height: 1.6; }
-  .clue .lock{ flex: 0 0 auto; font-size: 14px; opacity: 0.5; }
-
-  /* guess input */
-  .guess-row{ display: flex; gap: 8px; margin-bottom: 12px; }
-  .guess-row input{
-    flex: 1; background: var(--card); backdrop-filter: blur(12px);
-    border: 1px solid var(--card-border); border-radius: 14px;
-    padding: 14px 16px; color: var(--text); font: inherit; font-size: 15px; font-weight: 800; text-align: center;
-    box-shadow: var(--card-glow); transition: all 0.2s;
-  }
-  .guess-row input:focus{
+  .input-row input:focus{
     outline: none; border-color: var(--accent);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3); background: rgba(0, 0, 0, 0.5);
   }
-  .guess-row input::placeholder{ color: var(--hint); font-weight: 600; }
-  .guess-row button{
-    flex: 0 0 auto;
+  .input-row input::placeholder{ color: var(--hint); opacity: 0.7; font-size: 13px; }
+  .input-row button{
     background: linear-gradient(135deg, #38BDF8, #0284C7);
-    color: #06202B; border: 0; border-radius: 14px;
-    padding: 0 22px; font: inherit; font-size: 15px; font-weight: 900; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(56, 189, 248, 0.35);
+    color: #06202B; border: 0; border-radius: 12px;
+    padding: 0 20px; font: inherit; font-size: 14.5px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .guess-row button:active{ transform: scale(0.96); }
+  .input-row button:active{ transform: scale(0.96); }
 
-  .hint-buy{
+  /* Quick Suggestion Chips */
+  .chips{
+    display: flex; gap: 6px; overflow-x: auto; padding-top: 10px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar{ display: none; }
+  .chip{
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px; padding: 5px 11px; font-size: 11.5px; font-weight: 800;
+    color: var(--text); cursor: pointer; white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); flex: 0 0 auto;
+  }
+  .chip:active{ transform: scale(0.92); }
+  .chip:hover{ background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); }
+
+  /* Guess Comparison Grid (Real Wordle Matrix) */
+  .grid-header{
+    display: grid; grid-template-columns: 1.1fr 0.9fr 0.9fr 0.9fr 0.9fr 1.2fr;
+    gap: 6px; padding: 0 8px 6px; font-size: 11px; font-weight: 800; color: var(--hint);
+    text-align: center;
+  }
+  .guesses{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .guess-row{
+    display: grid; grid-template-columns: 1.1fr 0.9fr 0.9fr 0.9fr 0.9fr 1.2fr;
+    gap: 6px; animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn{
+    from { opacity: 0; transform: scale(0.92) translateY(6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .tile{
+    background: var(--card); backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border); border-radius: 12px;
+    padding: 10px 4px; text-align: center; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    font-size: 12px; font-weight: 900; transition: all 0.3s;
+    min-height: 52px;
+  }
+  .tile .sym{ font-size: 13px; font-weight: 900; }
+  .tile .sub{ font-size: 9px; opacity: 0.8; font-weight: 700; }
+  .tile.correct{
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.15));
+    border-color: rgba(34, 197, 94, 0.7); box-shadow: 0 0 14px rgba(34, 197, 94, 0.25);
+    color: #FFF;
+  }
+  .tile.higher, .tile.lower, .tile.right, .tile.left{
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.1));
+    border-color: rgba(245, 158, 11, 0.6); color: var(--gold);
+  }
+  .tile.wrong{
+    background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.4);
+    color: #FCA5A5;
+  }
+
+  /* Hint Button */
+  .hint-btn{
     width: 100%; background: rgba(245, 158, 11, 0.12); color: var(--gold);
     border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;
-    padding: 12px; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer;
-    margin-bottom: 16px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.12);
+    padding: 10px 14px; font: inherit; font-size: 12.5px; font-weight: 800;
+    cursor: pointer; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
   }
-  .hint-buy:active{ transform: scale(0.98); }
-  .hint-buy:disabled{ opacity: 0.4; cursor: default; }
-
-  /* feedback log */
-  .log{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-  .log-item{
-    display: flex; align-items: center; gap: 10px; background: var(--card);
-    backdrop-filter: blur(12px); border: 1px solid var(--card-border);
-    border-radius: 12px; padding: 11px 14px; font-size: 14px; font-weight: 700;
-    box-shadow: var(--card-glow); animation: in 0.25s;
+  .hint-btn:active{ transform: scale(0.98); }
+  .hint-box{
+    background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: #FEF3C7;
+    margin-bottom: 14px; animation: popIn 0.3s; line-height: 1.6;
   }
-  .log-item.bad{ border-right: 4px solid var(--bad); }
-  .log-item.good{ border-right: 4px solid var(--ok); }
-  .log-item .x{ flex: 0 0 auto; font-weight: 900; font-size: 15px; }
-  .log-item.bad .x{ color: var(--bad); }
-  .log-item.good .x{ color: var(--ok); }
 
-  /* result */
-  .result{
-    text-align: center; background: var(--card); backdrop-filter: blur(16px);
+  /* Result Screen */
+  .result-card{
+    background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--card-border); box-shadow: var(--card-glow);
-    border-radius: 20px; padding: 24px 20px;
-    animation: in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); margin-bottom: 18px;
+    border-radius: 20px; padding: 22px 18px; text-align: center;
+    margin-bottom: 14px; animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  @keyframes in{ from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
-  .result.win{
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(15, 23, 42, 0.85));
+  .result-card.win{
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(15, 23, 42, 0.85));
     border-color: rgba(34, 197, 94, 0.5);
-    box-shadow: 0 0 30px rgba(34, 197, 94, 0.25);
+    box-shadow: 0 0 32px rgba(34, 197, 94, 0.25);
   }
-  .result.lose{
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(15, 23, 42, 0.85));
+  .result-card.lose{
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(15, 23, 42, 0.85));
     border-color: rgba(239, 68, 68, 0.5);
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
   }
-  .result .emoji{ font-size: 48px; margin-bottom: 8px; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3)); }
-  .result h2{ font-size: 21px; font-weight: 900; margin-bottom: 6px; }
-  .result h2.w{ color: var(--ok); } .result h2.l{ color: var(--bad); }
-  .result .ans{ font-size: 17px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
-  .result .sym{
-    direction: ltr; unicode-bidi: isolate; display: inline-block;
-    font-size: 30px; font-weight: 900; color: var(--gold); margin: 8px 0;
-    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.5));
+  .res-sym{
+    font-size: 34px; font-weight: 900; color: var(--gold);
+    filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.5));
+    direction: ltr; unicode-bidi: isolate; margin: 4px 0 2px;
   }
-  .result p{ font-size: 13.5px; color: var(--hint); font-weight: 600; line-height: 1.7; margin-bottom: 14px; }
-  .streak-pill{
-    display: inline-block; background: rgba(245, 158, 11, 0.15); color: var(--gold);
-    border: 1px solid rgba(245, 158, 11, 0.35); box-shadow: 0 0 14px rgba(245, 158, 11, 0.2);
-    border-radius: 999px; padding: 7px 16px; font-size: 13.5px; font-weight: 900; margin-bottom: 14px;
+  .res-name{ font-size: 19px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+  .res-fun{ font-size: 13px; font-weight: 600; color: var(--hint); line-height: 1.7; margin-bottom: 16px; }
+  .res-stats{ display: flex; justify-content: center; gap: 14px; margin-bottom: 16px; }
+  .stat-pill{
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px; padding: 8px 14px; text-align: center;
   }
+  .stat-pill b{ display: block; font-size: 16px; font-weight: 900; color: var(--accent); }
+  .stat-pill span{ font-size: 10.5px; color: var(--hint); font-weight: 700; }
 
-  .foot{ margin-top: 20px; text-align: center; font-size: 11.5px; color: var(--hint); font-weight: 600; }
-  .foot a{ color: var(--accent); text-decoration: none; font-weight: 800; }
+  .share-btn{
+    width: 100%; background: linear-gradient(135deg, #38BDF8, #0284C7);
+    color: #06202B; border: 0; border-radius: 14px; padding: 13px;
+    font: inherit; font-size: 14.5px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 4px 18px rgba(56, 189, 248, 0.35); transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .share-btn:active{ transform: scale(0.97); }
+
+  /* Unified App Footer */
+  .app-footer{
+    margin-top: 20px;
+    background: var(--card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 18px; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .foot-brand{ display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .foot-logo{
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), #0284C7);
+    color: #FFF; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.35); flex: 0 0 auto;
+  }
+  .foot-info{ display: flex; flex-direction: column; min-width: 0; }
+  .foot-info b{ font-size: 12.5px; font-weight: 800; color: var(--text); }
+  .foot-info span{ font-size: 10.5px; color: var(--hint); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .foot-links{ display: flex; align-items: center; gap: 8px; }
+  .foot-link{
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(56, 189, 248, 0.10); border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 999px; padding: 5px 12px; text-decoration: none;
+    font-size: 11px; font-weight: 800; color: var(--accent);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .foot-link:hover{ background: rgba(56, 189, 248, 0.2); transform: translateY(-1px); }
 </style>
-
 </head>
 <body>
 
-<div class="nav">
-  <a href="index.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v4H9zM7 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M8 12h6M8 16h4"/></svg><span>آزمون</span></a>
-  <a href="planner.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>پلنر</span></a>
-  <a href="shimidle.html" class="on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg><span>شیمیدل</span></a>
+<div class="nav-bar">
+  <div class="hd">
+    <div>
+      <h1>🧩 <span>شیمیدل</span> پرو</h1>
+      <p>معمای روزانه جدول تناوبی کنکور</p>
+    </div>
+  </div>
+  <div class="nav">
+    <a href="index.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v4H9zM7 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M8 12h6M8 16h4"/></svg><span>آزمون</span></a>
+    <a href="planner.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>پلنر</span></a>
+    <a href="shimidle.html" class="on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg><span>شیمیدل</span></a>
+  </div>
 </div>
 
-<div class="hd">
-  <h1>🧩 <span>شیمیدل</span> — حدس عنصر روزانه</h1>
-  <p>از روی سرنخ‌ها حدس بزن! هر جواب غلط، یک سرنخ جدید باز می‌کنه</p>
-  <div class="day-pill" id="dayPill">پازل #۱</div>
+<div class="hero-guide">
+  <div class="guide-top">
+    <div class="guide-title">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>عنصر مخفی امروز را در ۶ حدس پیدا کن!</span>
+    </div>
+    <div class="day-badge" id="dayPill">پازل امروز</div>
+  </div>
+  <div class="legend">
+    <span class="leg-item"><span class="leg-box g">🟩</span> همسان</span>
+    <span class="leg-item"><span class="leg-box y">🔼</span> Z بزرگتر</span>
+    <span class="leg-item"><span class="leg-box y">🔽</span> Z کمتر</span>
+    <span class="leg-item"><span class="leg-box y">⬇️</span> دوره پایین‌تر</span>
+    <span class="leg-item"><span class="leg-box y">➡️</span> گروه راست‌تر</span>
+  </div>
 </div>
 
-<div class="clues" id="clues"></div>
-
-<div class="guess-row" id="guessRow">
-  <input id="guessInput" placeholder="نام عنصر را بنویس..." autocomplete="off">
-  <button id="guessBtn">حدس بزن</button>
+<div class="input-card" id="inputCard">
+  <div class="input-row">
+    <input id="elementInput" placeholder="نام یا نماد عنصر را بنویس (مثلاً Na یا آهن)..." autocomplete="off">
+    <button id="guessBtn">ثبت حدس</button>
+  </div>
+  <div class="chips" id="chips"></div>
 </div>
-<button class="hint-buy" id="hintBtn">💡 دیدن سرنخ بعدی (بدون از دست دادن امتیاز)</button>
 
-<div class="log" id="log"></div>
+<div class="grid-header">
+  <span>عنصر</span>
+  <span>عدد Z</span>
+  <span>دوره</span>
+  <span>گروه</span>
+  <span>دسته</span>
+  <span>نوع عنصر</span>
+</div>
+
+<div class="guesses" id="guesses"></div>
+
+<button class="hint-btn" id="hintBtn">💡 مشاهده نکته و سرنخ بالینی دکتر محمددوست</button>
+<div class="hint-box" id="hintBox" style="display:none"></div>
+
 <div id="resultBox"></div>
 
-<div class="foot">
-  کانال شیمی کنکور — <a href="https://t.me/shimi_mohamaddost">@shimi_mohamaddost</a>
-</div>
+<footer class="app-footer">
+  <div class="foot-brand">
+    <div class="foot-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.2 2.6h5.6"/>
+        <path d="M10.4 2.6v6.1L5.9 16.8A2.6 2.6 0 0 0 8.2 20.8h7.6a2.6 2.6 0 0 0 2.3-4L13.6 8.7V2.6"/>
+        <path d="M7.6 15.2h8.8"/>
+        <circle cx="10.6" cy="17.6" r="0.9" fill="currentColor" stroke="none"/>
+        <circle cx="13.6" cy="18.4" r="0.7" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="foot-info">
+      <b>شیمی کنکور | الهه محمددوست</b>
+      <span>دانشجوی پزشکی مشهد • رتبه ۷۸۸ کنکور سراسری</span>
+    </div>
+  </div>
+  <div class="foot-links">
+    <a href="https://t.me/shimi_mohamaddost" target="_blank" class="foot-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      <span>کانال رسمی</span>
+    </a>
+    <a href="https://t.me/Elahe_md1383" target="_blank" class="foot-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>مشاوره و کلاس</span>
+    </a>
+  </div>
+</footer>
 
 <script>
-
 /* ----- Lightweight Confetti Effect ----- */
 function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
   const canvas = document.createElement('canvas');
@@ -279,212 +407,238 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
 }
 
 const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-if (TG) { TG.ready(); TG.expand(); if (TG.isVersionAtLeast && TG.isVersionAtLeast('6.1')) { try { TG.setHeaderColor('#080D1F'); } catch(e){} try { TG.setBackgroundColor('#080D1F'); } catch(e){} } if (TG.isVersionAtLeast && TG.isVersionAtLeast('7.10')) { try { TG.setBottomBarColor('#080D1F'); } catch(e){} } }
+if (TG) {
+  TG.ready(); TG.expand();
+  if (TG.isVersionAtLeast && TG.isVersionAtLeast('6.1')) {
+    try { TG.setHeaderColor('#080D1F'); } catch(e){}
+    try { TG.setBackgroundColor('#080D1F'); } catch(e){}
+  }
+  if (TG.isVersionAtLeast && TG.isVersionAtLeast('7.10')) {
+    try { TG.setBottomBarColor('#080D1F'); } catch(e){}
+  }
+}
 const haptic = t => { if (TG && TG.HapticFeedback) { try { TG.HapticFeedback.impactOccurred(t); } catch(e){} } };
 
-/* ---- puzzle bank: clues ordered HARD → EASY ---- */
-const PUZZLES = [
-  {
-    day: 1, answer: "سدیم", aliases: ["سديم", "na", "سودیوم"],
-    symbol: "Na", z: 11,
-    fun: "با هالوژن‌ها عاشقی نمک می‌سازند، ولی خودش تو آب مثل کبریت آتیش می‌گیره! سدیم فلز قلیایی گروه ۱ با فقط ۱ الکترون ظرفیته که راحت می‌دهش.",
-    clues: [
-      "در بدن تو هم هست — ولی اگر زیاد بخوریش فشار خونت می‌ره بالا!",
-      "الکترون ظرفیتش فقط یکی‌ست؛ از دستش می‌ده و خوشحال هم هست!",
-      "توی لامپ‌های خیابانی زرد می‌درخشه",
-      "با هالوژن‌ها جور میشه و حاصلش همون نمک آشپزخونه‌ست",
-      "رنگ شعلش زرد غلیظه — نمک خورده رو بنداز تو شعله، همینه!"
-    ]
-  },
-  {
-    day: 2, answer: "مس", aliases: ["مص", "cu"],
-    symbol: "Cu", z: 29,
-    fun: "مس فلز انتقالی گروه ۱۱ از خانواده سکه‌هاست (طلا، نقره، مس). با اکسیژن که پیر میشه لایه سبز «پاتینه» می‌گیره — همون گنبدهای سبز!",
-    clues: [
-      "نژادش با نقره و طلا یکی‌ست — خانواده سکه‌های ارزشمند",
-      "سیم‌کشی خونه‌ت بدونش لنگه — بهترین رسانا بعد از نقره",
-      "با اکسیژن که پیر میشه، سبز می‌پوشه — همون گنبدهای معروف!",
-      "رنگ شعلش سبز-آبی خیلی قابل تشخیصه",
-      "خودشه! خالص‌ترین شکلش قرمز-نارنجی برق‌زنونه"
-    ]
-  },
-  {
-    day: 3, answer: "پتاسیم", aliases: ["پتاسيوم", "k", "پتاسیم", "ك"],
-    symbol: "K", z: 19,
-    fun: "پتاسیم برادر بزرگ‌تر و عصبی‌ترِ سدیمه! تو آب شدیدتر می‌ترکه. رادیواکتیو ضعیف طبیعیش داره — بدن تو از موز روزانه پتاسیم می‌گیره.",
-    clues: [
-      "موز برای تو داره، ولی خودش تو آب مثل ترکیدن بمب کوچیکه!",
-      "برادر بزرگ‌تر و عصبی‌ترِ سدیمه — گروه ۱ ولی دوره ۴",
-      "آرنج و عضلاتت بهش وابسته‌ست — کمبودش گرفتگی میاره",
-      "شعلش بنفشه — سخت‌ترین رنگ برای دیدن با چشم غیرمسلح",
-      "نمکش همون «پتاسیم» روی برچسب موزهاست!"
-    ]
-  },
-  {
-    day: 4, answer: "باریم", aliases: ["باريوم", "ba", "باریوم"],
-    symbol: "Ba", z: 56,
-    fun: "باریم گروه ۲ (خاکی‌ها) دوره ۶. سولفات نامحلولش تو رادیولوژی معروفه — «باریم میل» برای عکس معده. خود فلزش فوق‌العاده سمی‌ست!",
-    clues: [
-      "نمک خاصش تو رادیولوژی معروفه — ولی خود فلزش سمی خطرناکه!",
-      "به خانواده خاکی‌ها تعلق داره؛ سنگین‌وزنِ معروفِ گروه ۲",
-      "با سولفاتش معده رو عکس می‌گیرن — همون «باریم میل» معروف!",
-      "شعلش سبز روشنه — آتش‌بازی‌ها عاشقشن",
-      "حرف اول اسمش رو بگیر، ته اسمش «یوم» اضافه کن!"
-    ]
-  },
-  {
-    day: 5, answer: "استرانسیم", aliases: ["استرانسيوم", "sr", "استرانشیم"],
-    symbol: "Sr", z: 38,
-    fun: "استرانسیم گروه ۲ دوره ۵. قرمز آتش‌بازی‌ها کارشه! ایزوتوپ ۹۰ بدجنسش پسماند هسته‌ای معروفه. اسمش از دهکده Strontian اسکاتلند میاد.",
-    clues: [
-      "قرمزِ قرمزِ آتش‌بازی‌ها دست ساختشه",
-      "همسایه باریم و کلسیمه؛ خاکی ولی پرانرژی",
-      "ایزوتوپ ۹۰ بدجنسش پسماند هسته‌ای معروفه",
-      "استخوان‌ها عاشقش میشن چون شبیه کلسیمه — و همین خطرناکه!",
-      "اسمش از یه دهکده اسکاتلندی میاد: Strontian"
-    ]
-  },
-  {
-    day: 6, answer: "نئون", aliases: ["نئون", "ne", "نيون"],
-    symbol: "Ne", z: 10,
-    fun: "نئون گاز نجیب دوره ۲ با ۸ الکترون ظرفیت کامل — هیچ واکنشی نمی‌ده! لامپ‌های تبلیغاتی قرمز-نارنجی جهان از نور التهابش استفاده می‌کنن.",
-    clues: [
-      "خانواده‌اش به هیچ‌کس کاری ندارن — کامل‌ترین اکتت!",
-      "دوره ۲ ولی اصلاً سبک‌باله؛ از هلیوم سنگین‌تره",
-      "تابلوی تبلیغاتی قرمز-نارنجی شهر، نور التهابشه",
-      "اسمش از یونانی یعنی «جدید»",
-      "حروف اولش رو برعکس بخون: «نو ان»!"
-    ]
-  },
-  {
-    day: 7, answer: "کلسیم", aliases: ["كلسيم", "ca", "کلسیوم"],
-    symbol: "Ca", z: 20,
-    fun: "کلسیم گروه ۲ دوره ۴ — ۹۹٪ بدنت تو استخوانه! شعلش نارنجی-قرمزه. با آب واکنش ملایم‌تری از برادراش داره.",
-    clues: [
-      "۹۹٪ بدن تو از این عنصره — ولی تو استخوان، نه تو آزمایشگاه!",
-      "گروه ۲ دوره ۴ — همسایه پتاسیم و اسکاندیوم",
-      "شعلش نارنجی-قرمزه — شبیه آتیش کم‌جان",
-      "با آب واکنش می‌ده ولی خفه‌کننده نیست؛ ملایم‌تر از برادراش",
-      "اسمش از لاتین Calx یعنی «آهک» میاد!"
-    ]
-  }
-];
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[+d]);
 
-/* ---- state ---- */
-const KEY = "shimidle_v1";
+/* ---- Elements Database ---- */
+const ELEMENTS = [{"z": 1, "sym": "H", "name": "هیدروژن", "period": 1, "group": 1, "block": "s", "type": "نافلز", "fun": "هیدروژن تنها نافلز گروه ۱ است! در عین حال می‌تواند با فلزات ترکیب شده و هیدرید منفی بسازد."}, {"z": 2, "sym": "He", "name": "هلیوم", "period": 1, "group": 18, "block": "s", "type": "گاز نجیب", "fun": "هلیوم با اینکه در گروه ۱۸ است اما فقط ۲ الکترون ظرفیت دارد و در دسته s قرار می‌گیرد؛ تله کلاسیک کنکور!"}, {"z": 3, "sym": "Li", "name": "لیتیم", "period": 2, "group": 1, "block": "s", "type": "فلز قلیایی", "fun": "سبک‌ترین فلز با بیشترین پتانسیل اکسیداسیون استاندارد! در باتری‌های مدرن و داروی دوقطبی استفاده می‌شود."}, {"z": 4, "sym": "Be", "name": "بریلیم", "period": 2, "group": 2, "block": "s", "type": "فلز قلیایی خاکی", "fun": "تنها فلز قلیایی خاکی که پیوندهای کووالانسی پایدار تشکیل می‌دهد و اکسید آن آمفوتر است."}, {"z": 5, "sym": "B", "name": "بور", "period": 2, "group": 13, "block": "p", "type": "شبه‌فلز", "fun": "تنها شبه‌فلز دوره ۲! اسید بوریک آن به عنوان ضدعفونی‌کننده چشمی در پزشکی کاربرد دارد."}, {"z": 6, "sym": "C", "name": "کربن", "period": 2, "group": 14, "block": "p", "type": "نافلز", "fun": "سلطان شیمی آلی با قابلیت کاتناسیون (زنجیره‌سازی). دگرشکل‌های معروفی مثل گرافیت و الماس دارد."}, {"z": 7, "sym": "N", "name": "نیتروژن", "period": 2, "group": 15, "block": "p", "type": "نافلز", "fun": "پیوند سه‌گانه N≡N بسیار قوی و پرانرژی است؛ به همین دلیل در ساخت مواد منفجره و کیسه هوای خودرو به کار می‌رود."}, {"z": 8, "sym": "O", "name": "اکسیژن", "period": 2, "group": 16, "block": "p", "type": "نافلز", "fun": "فراوان‌ترین عنصر پوسته زمین! پارامغناطیس بودن O2 مایع نشان‌دهنده وجود الکترون‌های جفت‌نشده است."}, {"z": 9, "sym": "F", "name": "فلوئور", "period": 2, "group": 17, "block": "p", "type": "هالوژن", "fun": "الکترونگاتیوترین عنصر جدول تناوبی (۴.۰)! عدد اکسایش آن در تمام ترکیبات همواره ۱- است."}, {"z": 10, "sym": "Ne", "name": "نئون", "period": 2, "group": 18, "block": "p", "type": "گاز نجیب", "fun": "گاز نجیب دوره ۲ با آرایش الکترونی کامل و نور التهابی سرخ-نارنجی در لامپ‌های تبلیغاتی."}, {"z": 11, "sym": "Na", "name": "سدیم", "period": 3, "group": 1, "block": "s", "type": "فلز قلیایی", "fun": "فلز نرم با رنگ شعله زرد شاخص! کاتیون اصلی مایع خارج سلولی بدن برای حفظ فشار اسمزی و پتانسیل عمل."}, {"z": 12, "sym": "Mg", "name": "منیزیم", "period": 3, "group": 2, "block": "s", "type": "فلز قلیایی خاکی", "fun": "در مرکز ساختار کلروفیل گیاهان قرار دارد و با نور سفید خیره‌کننده می‌سوزد."}, {"z": 13, "sym": "Al", "name": "آلومینیم", "period": 3, "group": 13, "block": "p", "type": "فلز", "fun": "فراوان‌ترین فلز پوسته زمین! اکسید آن (Al2O3) لایه محافظتی چسبنده و آمفوتر تشکیل می‌دهد."}, {"z": 14, "sym": "Si", "name": "سیلیسیم", "period": 3, "group": 14, "block": "p", "type": "شبه‌فلز", "fun": "پایه‌گذار سیلیکون‌ولی و صنعت نیمه‌رساناها؛ دومین عنصر فراوان پوسته زمین بعد از اکسیژن."}, {"z": 15, "sym": "P", "name": "فسفر", "period": 3, "group": 15, "block": "p", "type": "نافلز", "fun": "در ساختار DNA و اسکلت استخوانی (فسفات کلسیم) حیاتی است. فسفر سفید در هوا خودبه‌خود آتش می‌گیرد."}, {"z": 16, "sym": "S", "name": "گوگرد", "period": 3, "group": 16, "block": "p", "type": "نافلز", "fun": "به شکل مولکول‌های ۸ اتمی حلقوی S8 در طبیعت یافت می‌شود و بوی تخم‌مرغ گندیده مربوط به گاز H2S آن است."}, {"z": 17, "sym": "Cl", "name": "کلر", "period": 3, "group": 17, "block": "p", "type": "هالوژن", "fun": "گاز زرد مایل به سبز تند و ضدعفونی‌کننده! اسید معده (HCl) توسط سلول‌های جداره معده ترشح می‌شود."}, {"z": 18, "sym": "Ar", "name": "آرگون", "period": 3, "group": 18, "block": "p", "type": "گاز نجیب", "fun": "فراوان‌ترین گاز نجیب اتمسفر زمین (حدود ۰.۹۳٪). گاز بی‌اثر درون لامپ‌های رشته‌ای."}, {"z": 19, "sym": "K", "name": "پتاسیم", "period": 4, "group": 1, "block": "s", "type": "فلز قلیایی", "fun": "کاتیون اصلی درون سلولی برای انقباض ماهیچه قلب! رنگ شعله آن بنفش یاسی زیباست."}, {"z": 20, "sym": "Ca", "name": "کلسیم", "period": 4, "group": 2, "block": "s", "type": "فلز قلیایی خاکی", "fun": "عنصر کلیدی استحکام استخوان و دندان و انعقاد خون؛ رنگ شعله آن قرمز آجری است."}, {"z": 21, "sym": "Sc", "name": "اسکاندیم", "period": 4, "group": 3, "block": "d", "type": "فلز واسطه", "fun": "نخستین فلز واسطه جدول تناوبی! تنها یک عدد اکسایش (۳+) دارد و یون آن بی‌رنگ و دیامغناطیس است."}, {"z": 22, "sym": "Ti", "name": "تیتانیم", "period": 4, "group": 4, "block": "d", "type": "فلز واسطه", "fun": "فلز زیست‌سازگار بسیار مقاوم! اکسید آن (TiO2) رنگدانه سفید اصلی در ضدآفتاب‌ها و داروسازی است."}, {"z": 23, "sym": "V", "name": "وانادیم", "period": 4, "group": 5, "block": "d", "type": "فلز واسطه", "fun": "یون‌های آن در حالت‌های اکسایش ۲+ تا ۵+ رنگ‌های شگفت‌انگیزی (بنفش، سبز، آبی، زرد) ایجاد می‌کنند."}, {"z": 24, "sym": "Cr", "name": "کروم", "period": 4, "group": 6, "block": "d", "type": "فلز واسطه", "fun": "آرایش الکترونی استثنایی 4s¹ 3d⁵! فلزی براق برای روکش ضدزنگ استیل."}, {"z": 25, "sym": "Mn", "name": "منگنز", "period": 4, "group": 7, "block": "d", "type": "فلز واسطه", "fun": "دارای بیشترین تعداد الکترون تک در حالت خنثی؛ پرمنگنات (KMnO4) اکسیدکننده بنفش مشهور شیمی کنکور."}, {"z": 26, "sym": "Fe", "name": "آهن", "period": 4, "group": 8, "block": "d", "type": "فلز واسطه", "fun": "در مرکز مولکول هموگلوبین خون که وظیفه انتقال گازهای تنفسی به بافت‌ها را دارد."}, {"z": 27, "sym": "Co", "name": "کبالت", "period": 4, "group": 9, "block": "d", "type": "فلز واسطه", "fun": "در ساختار ویتامین B12 حیاتی است. رنگ آبی شیشه‌های سنتی مربوط به ترکیبات کبالت است."}, {"z": 28, "sym": "Ni", "name": "نیکل", "period": 4, "group": 10, "block": "d", "type": "فلز واسطه", "fun": "کاتالیزور هیدروژناسیون روغن‌های مایع خوراکی به جامد؛ مقاوم در برابر خوردگی."}, {"z": 29, "sym": "Cu", "name": "مس", "period": 4, "group": 11, "block": "d", "type": "فلز واسطه", "fun": "آرایش استثنایی 4s¹ 3d¹⁰! بهترین رسانای الکتریکی کاربردی و کاتیون تشکیل‌دهنده رنگ سبز شعله."}, {"z": 30, "sym": "Zn", "name": "روی", "period": 4, "group": 12, "block": "d", "type": "فلز واسطه", "fun": "در گالوانیزه کردن آهن علیه زنگ‌زدگی به کار می‌رود؛ آنزیم‌های گوارشی حاوی روی برای ترمیم بافت‌ها ضروریند."}, {"z": 31, "sym": "Ga", "name": "گالیم", "period": 4, "group": 13, "block": "p", "type": "فلز", "fun": "فلزی که در دمای دست انسان (۲۹.۷ درجه) ذوب می‌شود! پیش‌بینی شاهکار مندلیف با نام اکا-آلومینیم."}, {"z": 32, "sym": "Ge", "name": "ژرمانیم", "period": 4, "group": 14, "block": "p", "type": "شبه‌فلز", "fun": "شبه‌فلز تاریخی که مندلیف خواص آن را با نام اکا-سیلیسیم با دقت خارق‌العاده پیش‌بینی کرده بود."}, {"z": 33, "sym": "As", "name": "آرسنیک", "period": 4, "group": 15, "block": "p", "type": "شبه‌فلز", "fun": "شبه‌فلز سمی مشهور که با اختلال در زنجیره انتقال الکترون میتوکندری تنفس سلولی را مهار می‌کند."}, {"z": 34, "sym": "Se", "name": "سلنیم", "period": 4, "group": 16, "block": "p", "type": "نافلز", "fun": "نافلز حساس به نور مورد استفاده در سلول‌های خورشیدی و فتوکپی، و آنتی‌اکسیدان ضروری بدن."}, {"z": 35, "sym": "Br", "name": "برم", "period": 4, "group": 17, "block": "p", "type": "هالوژن", "fun": "تنها نافلز مایع در دمای اتاق! مایع سرخ-قهوه‌ای تند که بخار خفه‌کننده‌ای تولید می‌کند."}, {"z": 36, "sym": "Kr", "name": "کریپتون", "period": 4, "group": 18, "block": "p", "type": "گاز نجیب", "fun": "گاز نجیب دوره ۴؛ نام آن از واژه یونانی به معنای «پنهان» گرفته شده است."}, {"z": 38, "sym": "Sr", "name": "استرانسیم", "period": 5, "group": 2, "block": "s", "type": "فلز قلیایی خاکی", "fun": "رنگ قرمز درخشان آتش‌بازی‌ها دست‌ساخت نمک‌های استرانسیم است؛ در استخوان‌ها جایگزین کلسیم می‌شود."}, {"z": 47, "sym": "Ag", "name": "نقره", "period": 5, "group": 11, "block": "d", "type": "فلز واسطه", "fun": "بالاترین رسانایی الکتریکی و گرمایی بین تمام فلزات جهان! خاصیت ضدباکتریایی قوی دارد."}, {"z": 53, "sym": "I", "name": "ید", "period": 5, "group": 17, "block": "p", "type": "هالوژن", "fun": "جامد بنفش تیره که به سرعت تصعید می‌شود؛ عنصر کلیدی هورمون‌های تیروئید (تیروکسین)."}, {"z": 56, "sym": "Ba", "name": "باریم", "period": 6, "group": 2, "block": "s", "type": "فلز قلیایی خاکی", "fun": "سولفات نامحلول آن در تصویربرداری پزشکی از دستگاه گوارش (سوسپانسیون باریم) کاربرد طلایی دارد."}, {"z": 79, "sym": "Au", "name": "طلا", "period": 6, "group": 11, "block": "d", "type": "فلز واسطه", "fun": "پادشاه فلزات نجیب! چکش‌خوارترین عنصر که تنها در تیزاب سلطانی (مخلوط HCl و HNO3) حل می‌شود."}];
+
+/* Pick secret element by day index */
 const today = new Date();
-const dayIndex = Math.floor(today.getTime() / 86400000) % PUZZLES.length;
-const P = PUZZLES[dayIndex];
+const dayNumber = Math.floor(today.getTime() / 86400000);
+const secretIndex = dayNumber % ELEMENTS.length;
+const SECRET = ELEMENTS[secretIndex];
 
+const KEY = "shimidle_pro_v2_" + secretIndex;
 let state = {
-  puzzleDay: P.day,
-  wrong: 0, hintsUsed: 0,
-  unlocked: 1, guesses: [],
-  solved: false, streak: 1, lastWinDay: null
+  guesses: [],
+  solved: false,
+  failed: false,
+  hintUsed: false,
+  streak: 1
 };
 
 function load() {
   try {
-    const s = JSON.parse(localStorage.getItem(KEY));
-    if (s && s.puzzleDay === P.day) state = { ...state, ...s };
+    const raw = localStorage.getItem(KEY);
+    if (raw) state = { ...state, ...JSON.parse(raw) };
+    const st = localStorage.getItem("shimidle_streak");
+    if (st) state.streak = parseInt(st) || 1;
   } catch (e) {}
 }
-function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
-
-/* ---- render ---- */
-function fa(n) { return String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[+d]); }
-
-function renderClues() {
-  document.getElementById("clues").innerHTML = P.clues.map((c, i) => {
-    const unlocked = i < state.unlocked;
-    const current = i === state.unlocked - 1 && !state.solved;
-    return `<div class="clue ${unlocked ? "unlocked" : ""} ${current ? "current" : ""}">
-      <span class="n">${fa(i + 1)}</span>
-      <span class="txt">${unlocked ? c : "🔒 سرنخ قفل است"}</span>
-      ${unlocked ? "" : '<span class="lock">🔒</span>'}
-    </div>`;
-  }).join("");
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(state));
+  localStorage.setItem("shimidle_streak", state.streak);
 }
 
-function renderLog() {
-  document.getElementById("log").innerHTML = state.guesses.map(g =>
-    `<div class="log-item ${g.ok ? "good" : "bad"}">
-      <span class="x">${g.ok ? "✓" : "✕"}</span>
-      <span>${g.ok ? "درست بود!" : "«" + g.text + "» — نه، این نیست!"}</span>
-    </div>`).join("");
-}
-
-function checkGuess() {
-  const inp = document.getElementById("guessInput");
-  const val = inp.value.trim();
-  if (!val || state.solved) return;
-
-  const ok = P.aliases.includes(val) || val === P.answer;
-  state.guesses.push({ text: val, ok });
-
-  if (ok) {
-    state.solved = true;
-    state.streak = (state.lastWinDay === String(dayIndex - 1)) ? state.streak + 1 : 1;
-    state.lastWinDay = String(dayIndex);
-    fireConfetti(); setTimeout(() => fireConfetti(window.innerWidth * 0.7, window.innerHeight * 0.25), 250);
-    haptic("medium");
-    renderResult();
-  } else {
-    state.wrong++;
-    if (state.unlocked < P.clues.length) state.unlocked++;
-    haptic("rigid");
-  }
-  inp.value = "";
-  save();
-  renderClues();
-  renderLog();
-}
-
-function showHint() {
-  if (state.unlocked < P.clues.length) {
-    state.unlocked++;
-    state.hintsUsed++;
-    haptic("light");
-    save();
-    renderClues();
-  }
-}
-
-function renderResult() {
-  const won = state.solved;
-  const box = document.getElementById("resultBox");
-  box.innerHTML = `
-    <div class="result ${won ? "win" : "lose"}">
-      <div class="emoji">${won ? "🎉" : "😅"}</div>
-      <h2 class="${won ? "w" : "l"}">${won ? "درست حدس زدی!" : "وقت تموم شد!"}</h2>
-      <div class="ans">عنصر روز: ${P.answer}</div>
-      <div class="sym">${P.symbol} · Z = ${fa(P.z)}</div>
-      <p>${P.fun}</p>
-      ${won ? `<div class="streak-pill">🔥 استریک: ${fa(state.streak)} روز پیاپی</div>` : ""}
-      <button class="hint-buy" id="shareBtn" style="background:rgba(56,189,248,.14);color:var(--accent)">
-        📤 به دوستانت چالش بفرست
-      </button>
-    </div>`;
-  document.getElementById("guessRow").style.display = "none";
-  document.getElementById("hintBtn").style.display = "none";
-  document.getElementById("shareBtn").onclick = () => {
-    const txt = won
-      ? `🧩 شیمیدل روز ${fa(P.day)} رو درست حدس زدم! (${fa(state.guesses.length)} حدس)\nتو هم امتحان کن: @shimi_mohamaddost`
-      : `🧩 شیمیدل امروز نگرفتم! بیا تو حدس بزن: @shimi_mohamaddost`;
-    if (TG) { try { TG.openTelegramLink("https://t.me/share/url?url=https://t.me/shimi_mohamaddost&text=" + encodeURIComponent(txt)); return; } catch(e){} }
-    window.open("https://t.me/share/url?url=https://t.me/shimi_mohamaddost&text=" + encodeURIComponent(txt), "_blank");
+/* Compare guess with secret element */
+function evaluateGuess(g) {
+  const s = SECRET;
+  return {
+    element: g,
+    z: { val: g.z, status: g.z === s.z ? "correct" : g.z < s.z ? "higher" : "lower", text: g.z === s.z ? fa(g.z) : (g.z < s.z ? "🔼 " + fa(g.z) : "🔽 " + fa(g.z)) },
+    period: { val: g.period, status: g.period === s.period ? "correct" : g.period < s.period ? "lower" : "higher", text: g.period === s.period ? fa(g.period) : (g.period < s.period ? "⬇️ " + fa(g.period) : "⬆️ " + fa(g.period)) },
+    group: { val: g.group, status: g.group === s.group ? "correct" : g.group < s.group ? "right" : "left", text: g.group === s.group ? fa(g.group) : (g.group < s.group ? "➡️ " + fa(g.group) : "⬅️ " + fa(g.group)) },
+    block: { val: g.block, status: g.block === s.block ? "correct" : "wrong", text: g.block },
+    type: { val: g.type, status: g.type === s.type ? "correct" : "wrong", text: g.type }
   };
 }
 
-/* ---- init ---- */
+function renderGuesses() {
+  const container = document.getElementById("guesses");
+  container.innerHTML = state.guesses.map(ev => `
+    <div class="guess-row">
+      <div class="tile ${ev.element.z === SECRET.z ? "correct" : ""}">
+        <span class="sym">${ev.element.sym}</span>
+        <span class="sub">${ev.element.name}</span>
+      </div>
+      <div class="tile ${ev.z.status}">
+        <span>${ev.z.text}</span>
+        <span class="sub">${ev.z.status === "correct" ? "دقیق" : ev.z.status === "higher" ? "بزرگتر" : "کوچکتر"}</span>
+      </div>
+      <div class="tile ${ev.period.status}">
+        <span>${ev.period.text}</span>
+        <span class="sub">${ev.period.status === "correct" ? "دقیق" : ev.period.status === "lower" ? "پایین‌تر" : "بالاتر"}</span>
+      </div>
+      <div class="tile ${ev.group.status}">
+        <span>${ev.group.text}</span>
+        <span class="sub">${ev.group.status === "correct" ? "دقیق" : ev.group.status === "right" ? "راست‌تر" : "چپ‌تر"}</span>
+      </div>
+      <div class="tile ${ev.block.status}">
+        <span>${ev.block.text}</span>
+        <span class="sub">دسته</span>
+      </div>
+      <div class="tile ${ev.type.status}">
+        <span style="font-size:10.5px">${ev.type.text}</span>
+        <span class="sub">گروه</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderChips(filter = "") {
+  const chipsContainer = document.getElementById("chips");
+  const norm = filter.trim().toLowerCase();
+  const matched = norm.length > 0
+    ? ELEMENTS.filter(e => e.name.includes(norm) || e.sym.toLowerCase().includes(norm) || String(e.z) === norm)
+    : [
+      ELEMENTS[10], // Na
+      ELEMENTS[18], // K
+      ELEMENTS[25], // Fe
+      ELEMENTS[28], // Cu
+      ELEMENTS[19], // Ca
+      ELEMENTS[7],  // O
+      ELEMENTS[16], // Cl
+      ELEMENTS[5],  // C
+      ELEMENTS[12]  // Al
+    ];
+
+  chipsContainer.innerHTML = matched.slice(0, 10).map(e => `
+    <div class="chip" data-z="${e.z}">
+      <b>${e.sym}</b> ${e.name} (${fa(e.z)})
+    </div>
+  `).join("");
+
+  chipsContainer.querySelectorAll(".chip").forEach(c =>
+    c.addEventListener("click", () => {
+      const el = ELEMENTS.find(x => x.z === +c.dataset.z);
+      if (el) submitGuess(el);
+    })
+  );
+}
+
+function submitGuess(el) {
+  if (state.solved || state.failed) return;
+  if (state.guesses.some(g => g.element.z === el.z)) {
+    haptic("rigid");
+    return;
+  }
+
+  const ev = evaluateGuess(el);
+  state.guesses.push(ev);
+
+  if (el.z === SECRET.z) {
+    state.solved = true;
+    state.streak++;
+    fireConfetti();
+    setTimeout(() => fireConfetti(window.innerWidth * 0.7, window.innerHeight * 0.3), 300);
+    haptic("medium");
+  } else if (state.guesses.length >= 6) {
+    state.failed = true;
+    haptic("rigid");
+  } else {
+    haptic("light");
+  }
+
+  save();
+  renderGuesses();
+  checkGameOver();
+  document.getElementById("elementInput").value = "";
+  renderChips();
+}
+
+function checkGameOver() {
+  if (state.solved || state.failed) {
+    document.getElementById("inputCard").style.display = "none";
+    document.getElementById("hintBtn").style.display = "none";
+    document.getElementById("hintBox").style.display = "none";
+
+    const won = state.solved;
+    const box = document.getElementById("resultBox");
+    box.innerHTML = `
+      <div class="result-card ${won ? "win" : "lose"}">
+        <div style="font-size:38px;margin-bottom:4px">${won ? "🎉" : "😅"}</div>
+        <div class="res-sym">${SECRET.sym}</div>
+        <div class="res-name">${won ? "عالی بود! عنصر مخفی امروز:" : "فرصت‌های امروز تموم شد! عنصر مخفی:"} ${SECRET.name} (Z = ${fa(SECRET.z)})</div>
+        <div class="res-fun">💡 <b>نکته طلایی کنکور:</b> ${SECRET.fun}</div>
+        <div class="res-stats">
+          <div class="stat-pill"><b>${fa(state.guesses.length)} / ۶</b><span>تعداد حدس</span></div>
+          <div class="stat-pill"><b>🔥 ${fa(state.streak)}</b><span>استریک روزانه</span></div>
+          <div class="stat-pill"><b>دوره ${fa(SECRET.period)} • گروه ${fa(SECRET.group)}</b><span>موقعیت جدول</span></div>
+        </div>
+        <button class="share-btn" id="shareResultBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>اشتراک‌گذاری نتیجه در تلگرام</span>
+        </button>
+      </div>
+    `;
+
+    document.getElementById("shareResultBtn").onclick = () => {
+      const gridText = state.guesses.map(g => {
+        const zSym = g.z.status === "correct" ? "🟩" : (g.z.status === "higher" ? "🔼" : "🔽");
+        const pSym = g.period.status === "correct" ? "🟩" : (g.period.status === "lower" ? "⬇️" : "⬆️");
+        const grSym = g.group.status === "correct" ? "🟩" : (g.group.status === "right" ? "➡️" : "⬅️");
+        const bSym = g.block.status === "correct" ? "🟩" : "🟥";
+        return `${zSym}${pSym}${grSym}${bSym}`;
+      }).join("\n");
+
+      const shareMsg = `🧩 شیمیدل پرو | معما #${fa(dayNumber % 365)}\n` +
+        `نتیجه: ${won ? fa(state.guesses.length) + "/۶" : "✕"}\n` +
+        gridText + `\n\n` +
+        `تو هم عنصر امروز رو حدس بزن 👇\n` +
+        `@shimi_mohamaddost`;
+
+      const shareUrl = "https://t.me/share/url?url=https://shimi-chemistry-quiz.netlify.app/shimidle.html&text=" + encodeURIComponent(shareMsg);
+      if (TG) {
+        try { TG.openTelegramLink(shareUrl); return; } catch(e){}
+      }
+      window.open(shareUrl, "_blank");
+    };
+  }
+}
+
+/* Init */
 load();
-document.getElementById("dayPill").textContent = `پازل #${fa(P.day)} — ${new Date().toLocaleDateString("fa-IR", { weekday: "long", day: "numeric", month: "long" })}`;
-renderClues();
-renderLog();
-if (state.solved) renderResult();
-document.getElementById("guessBtn").onclick = checkGuess;
-document.getElementById("hintBtn").onclick = showHint;
-document.getElementById("guessInput").addEventListener("keydown", e => { if (e.key === "Enter") checkGuess(); });
+document.getElementById("dayPill").textContent = `پازل #${fa((dayNumber % 100) + 1)} — ${today.toLocaleDateString("fa-IR", { weekday: "long", day: "numeric", month: "long" })}`;
+renderGuesses();
+renderChips();
+checkGameOver();
+
+const inp = document.getElementById("elementInput");
+inp.addEventListener("input", () => renderChips(inp.value));
+inp.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    const val = inp.value.trim().toLowerCase();
+    const found = ELEMENTS.find(x => x.name.toLowerCase() === val || x.sym.toLowerCase() === val || String(x.z) === val);
+    if (found) submitGuess(found);
+  }
+});
+
+document.getElementById("guessBtn").onclick = () => {
+  const val = inp.value.trim().toLowerCase();
+  const found = ELEMENTS.find(x => x.name.toLowerCase() === val || x.sym.toLowerCase() === val || String(x.z) === val);
+  if (found) submitGuess(found);
+  else haptic("rigid");
+};
+
+document.getElementById("hintBtn").onclick = () => {
+  const box = document.getElementById("hintBox");
+  box.style.display = "block";
+  box.innerHTML = `🩺 <b>سرنخ بالینی دکتر محمددوست:</b> ${SECRET.fun.slice(0, 70)}... (دوره ${fa(SECRET.period)} یا گروه ${fa(SECRET.group)} را بررسی کن!)`;
+  document.getElementById("hintBtn").style.display = "none";
+  haptic("light");
+};
 </script>
 </body>
 </html>

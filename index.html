@@ -281,6 +281,47 @@
   .rev.n i{ background: rgba(239, 68, 68, 0.2); color: var(--bad); }
   .rev span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.95; }
 
+  
+  /* Grade Breakdown in Result */
+  .grade-breakdown{
+    display: flex; gap: 8px; margin-bottom: 18px; justify-content: center; flex-wrap: wrap;
+  }
+  .gb-pill{
+    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--hint);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gb-pill b{ color: var(--accent); font-variant-numeric: tabular-nums; font-size: 13px; }
+
+  /* Unified App Footer */
+  .app-footer{
+    margin-top: 24px;
+    background: var(--card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 18px; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .foot-brand{ display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .foot-logo{
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), #0284C7);
+    color: #FFF; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.35); flex: 0 0 auto;
+  }
+  .foot-info{ display: flex; flex-direction: column; min-width: 0; }
+  .foot-info b{ font-size: 12.5px; font-weight: 800; color: var(--text); }
+  .foot-info span{ font-size: 10.5px; color: var(--hint); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .foot-links{ display: flex; align-items: center; gap: 8px; }
+  .foot-link{
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(56, 189, 248, 0.10); border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 999px; padding: 5px 12px; text-decoration: none;
+    font-size: 11px; font-weight: 800; color: var(--accent);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .foot-link:hover{ background: rgba(56, 189, 248, 0.2); transform: translateY(-1px); }
+
   .foot{ margin-top: 24px; text-align: center; font-size: 11.5px; color: var(--hint); font-weight: 600; }
   .foot a{ color: var(--accent); text-decoration: none; font-weight: 800; }
 </style>
@@ -314,9 +355,33 @@
 
 <main id="app"></main>
 
-<div class="foot">
-  کانال شیمی کنکور — <a href="https://t.me/shimi_mohamaddost" id="chlink">@shimi_mohamaddost</a>
-</div>
+<footer class="app-footer">
+  <div class="foot-brand">
+    <div class="foot-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.2 2.6h5.6"/>
+        <path d="M10.4 2.6v6.1L5.9 16.8A2.6 2.6 0 0 0 8.2 20.8h7.6a2.6 2.6 0 0 0 2.3-4L13.6 8.7V2.6"/>
+        <path d="M7.6 15.2h8.8"/>
+        <circle cx="10.6" cy="17.6" r="0.9" fill="currentColor" stroke="none"/>
+        <circle cx="13.6" cy="18.4" r="0.7" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="foot-info">
+      <b>شیمی کنکور | الهه محمددوست</b>
+      <span>دانشجوی پزشکی مشهد • رتبه ۷۸۸ کنکور سراسری</span>
+    </div>
+  </div>
+  <div class="foot-links">
+    <a href="https://t.me/shimi_mohamaddost" target="_blank" class="foot-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      <span>کانال رسمی</span>
+    </a>
+    <a href="https://t.me/Elahe_md1383" target="_blank" class="foot-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>مشاوره و کلاس</span>
+    </a>
+  </div>
+</footer>
 
 <script>
 
@@ -639,6 +704,15 @@ function renderResult(){
 
   const right = answers.filter(a => a.ok).length;
   const wrong = answers.length - right;
+  
+  // Grade-wise percentages
+  const g10 = answers.filter(a => QUESTIONS[a.i].grade === 10);
+  const g11 = answers.filter(a => QUESTIONS[a.i].grade === 11);
+  const g12 = answers.filter(a => QUESTIONS[a.i].grade === 12);
+  const p10 = g10.length ? Math.round((g10.filter(a => a.ok).length / g10.length) * 100) : null;
+  const p11 = g11.length ? Math.round((g11.filter(a => a.ok).length / g11.length) * 100) : null;
+  const p12 = g12.length ? Math.round((g12.filter(a => a.ok).length / g12.length) * 100) : null;
+
   const used = answers.reduce((s,a) => s + (TIME_PER_Q - Math.max(left,0)), 0);
 
   app.innerHTML = `
@@ -659,6 +733,13 @@ function renderResult(){
         <div class="stat"><b style="color:var(--ok)">${fa(right)}</b><span>درست</span></div>
         <div class="stat"><b style="color:var(--bad)">${fa(wrong)}</b><span>نادرست</span></div>
         <div class="stat"><b>${fa(pct)}٪</b><span>درصد</span></div>
+      </div>
+
+      
+      <div class="grade-breakdown">
+        ${p10 !== null ? `<div class="gb-pill"><span>شیمی دهم:</span> <b>${fa(p10)}٪</b></div>` : ""}
+        ${p11 !== null ? `<div class="gb-pill"><span>شیمی یازدهم:</span> <b>${fa(p11)}٪</b></div>` : ""}
+        ${p12 !== null ? `<div class="gb-pill"><span>شیمی دوازدهم:</span> <b>${fa(p12)}٪</b></div>` : ""}
       </div>
 
       <div class="review">
