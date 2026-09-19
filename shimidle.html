@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>شیمیدل — حدس عنصر روزانه</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg: var(--tg-theme-bg-color, #0A1128);
+    --text: var(--tg-theme-text-color, #EAF2FF);
+    --hint: var(--tg-theme-hint-color, #A7B7D6);
+    --accent: #38BDF8;
+    --gold: #F1C40F;
+    --ok: #22C55E;
+    --bad: #EF4444;
+    --card: rgba(255,255,255,.045);
+    --card2: rgba(255,255,255,.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Vazirmatn",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:16px; line-height:1.6;
+    padding:max(14px, env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom));
+    max-width:560px; margin:0 auto; overflow-x:hidden;
+  }
+  .nav{display:flex;gap:4px;background:var(--card);border-radius:14px;padding:4px;margin-bottom:16px}
+  .nav a{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+         padding:10px 4px;border-radius:10px;text-decoration:none;font-size:12px;
+         font-weight:800;color:var(--hint);transition:.18s}
+  .nav a.on{background:rgba(56,189,248,.16);color:var(--accent)}
+
+  .hd{text-align:center;margin-bottom:14px}
+  .hd h1{font-size:20px;font-weight:900}
+  .hd h1 span{color:var(--accent)}
+  .hd p{font-size:12px;color:var(--hint);font-weight:600}
+
+  .day-pill{
+    display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+    background:rgba(56,189,248,.10);color:var(--accent);
+    border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:800;
+  }
+
+  /* clue cards */
+  .clues{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+  .clue{
+    background:var(--card);border-radius:13px;padding:13px 15px;
+    display:flex;align-items:center;gap:11px;
+    opacity:.45;pointer-events:none;transition:.3s;
+    border:1px solid transparent;
+  }
+  .clue.unlocked{opacity:1;pointer-events:auto}
+  .clue.current{border-color:rgba(56,189,248,.45);background:rgba(56,189,248,.08)}
+  .clue .n{
+    flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--card2);display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:900;color:var(--hint);
+  }
+  .clue.current .n{background:var(--accent);color:#06202B}
+  .clue .txt{flex:1;font-size:14px;font-weight:700;line-height:1.55}
+  .clue .lock{flex:0 0 auto;font-size:15px;opacity:.5}
+
+  /* guess input */
+  .guess-row{display:flex;gap:8px;margin-bottom:10px}
+  .guess-row input{
+    flex:1;background:var(--card2);border:0;border-radius:12px;
+    padding:13px 15px;color:var(--text);font:inherit;font-size:15px;font-weight:800;text-align:center;
+  }
+  .guess-row input:focus{outline:none}
+  .guess-row input::placeholder{color:var(--hint);font-weight:600}
+  .guess-row button{
+    flex:0 0 auto;background:var(--accent);color:#06202B;border:0;border-radius:12px;
+    padding:0 20px;font:inherit;font-size:15px;font-weight:900;cursor:pointer;
+  }
+  .hint-buy{
+    width:100%;background:rgba(241,196,15,.12);color:var(--gold);border:0;border-radius:12px;
+    padding:11px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;margin-bottom:14px;
+  }
+  .hint-buy:disabled{opacity:.4;cursor:default}
+
+  /* feedback log */
+  .log{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+  .log-item{
+    display:flex;align-items:center;gap:9px;background:var(--card);
+    border-radius:10px;padding:9px 13px;font-size:13.5px;font-weight:700;
+  }
+  .log-item.bad{border-right:3px solid var(--bad)}
+  .log-item.good{border-right:3px solid var(--ok)}
+  .log-item .x{flex:0 0 auto;font-weight:900}
+  .log-item.bad .x{color:var(--bad)}
+  .log-item.good .x{color:var(--ok)}
+
+  /* result */
+  .result{
+    text-align:center;background:var(--card);border-radius:16px;padding:22px 18px;
+    animation:in .35s cubic-bezier(.4,0,.2,1);margin-bottom:16px;
+  }
+  @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .result.win{background:rgba(34,197,94,.10)}
+  .result.lose{background:rgba(239,68,68,.10)}
+  .result .emoji{font-size:44px;margin-bottom:8px}
+  .result h2{font-size:19px;font-weight:900;margin-bottom:5px}
+  .result h2.w{color:var(--ok)} .result h2.l{color:var(--bad)}
+  .result .ans{font-size:16px;font-weight:800;color:var(--accent);margin-bottom:4px}
+  .result .sym{
+    direction:ltr;unicode-bidi:isolate;display:inline-block;
+    font-size:26px;font-weight:900;color:var(--gold);margin:6px 0;
+  }
+  .result p{font-size:13px;color:var(--hint);font-weight:600;margin-bottom:12px}
+  .streak-pill{
+    display:inline-block;background:rgba(241,196,15,.14);color:var(--gold);
+    border-radius:999px;padding:6px 14px;font-size:13px;font-weight:900;margin-bottom:12px;
+  }
+
+  .foot{margin-top:16px;text-align:center;font-size:11px;color:var(--hint);font-weight:600}
+  .foot a{color:var(--accent);text-decoration:none;font-weight:800}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v4H9zM7 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M8 12h6M8 16h4"/></svg><span>آزمون</span></a>
+  <a href="planner.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>پلنر</span></a>
+  <a href="shimidle.html" class="on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg><span>شیمیدل</span></a>
+</div>
+
+<div class="hd">
+  <h1>🧩 <span>شیمیدل</span> — حدس عنصر روزانه</h1>
+  <p>از روی سرنخ‌ها حدس بزن! هر جواب غلط، یک سرنخ جدید باز می‌کنه</p>
+  <div class="day-pill" id="dayPill">پازل #۱</div>
+</div>
+
+<div class="clues" id="clues"></div>
+
+<div class="guess-row" id="guessRow">
+  <input id="guessInput" placeholder="نام عنصر را بنویس..." autocomplete="off">
+  <button id="guessBtn">حدس بزن</button>
+</div>
+<button class="hint-buy" id="hintBtn">💡 دیدن سرنخ بعدی (بدون از دست دادن امتیاز)</button>
+
+<div class="log" id="log"></div>
+<div id="resultBox"></div>
+
+<div class="foot">
+  کانال شیمی کنکور — <a href="https://t.me/shimi_mohamaddost">@shimi_mohamaddost</a>
+</div>
+
+<script>
+const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+if (TG) { TG.ready(); TG.expand(); try { TG.setHeaderColor("secondary_bg_color"); } catch(e){} }
+const haptic = t => { if (TG && TG.HapticFeedback) { try { TG.HapticFeedback.impactOccurred(t); } catch(e){} } };
+
+/* ---- puzzle bank: clues ordered HARD → EASY ---- */
+const PUZZLES = [
+  {
+    day: 1, answer: "سدیم", aliases: ["سديم", "na", "سودیوم"],
+    symbol: "Na", z: 11,
+    fun: "با هالوژن‌ها عاشقی نمک می‌سازند، ولی خودش تو آب مثل کبریت آتیش می‌گیره! سدیم فلز قلیایی گروه ۱ با فقط ۱ الکترون ظرفیته که راحت می‌دهش.",
+    clues: [
+      "در بدن تو هم هست — ولی اگر زیاد بخوریش فشار خونت می‌ره بالا!",
+      "الکترون ظرفیتش فقط یکی‌ست؛ از دستش می‌ده و خوشحال هم هست!",
+      "توی لامپ‌های خیابانی زرد می‌درخشه",
+      "با هالوژن‌ها جور میشه و حاصلش همون نمک آشپزخونه‌ست",
+      "رنگ شعلش زرد غلیظه — نمک خورده رو بنداز تو شعله، همینه!"
+    ]
+  },
+  {
+    day: 2, answer: "مس", aliases: ["مص", "cu"],
+    symbol: "Cu", z: 29,
+    fun: "مس فلز انتقالی گروه ۱۱ از خانواده سکه‌هاست (طلا، نقره، مس). با اکسیژن که پیر میشه لایه سبز «پاتینه» می‌گیره — همون گنبدهای سبز!",
+    clues: [
+      "نژادش با نقره و طلا یکی‌ست — خانواده سکه‌های ارزشمند",
+      "سیم‌کشی خونه‌ت بدونش لنگه — بهترین رسانا بعد از نقره",
+      "با اکسیژن که پیر میشه، سبز می‌پوشه — همون گنبدهای معروف!",
+      "رنگ شعلش سبز-آبی خیلی قابل تشخیصه",
+      "خودشه! خالص‌ترین شکلش قرمز-نارنجی برق‌زنونه"
+    ]
+  },
+  {
+    day: 3, answer: "پتاسیم", aliases: ["پتاسيوم", "k", "پتاسیم", "ك"],
+    symbol: "K", z: 19,
+    fun: "پتاسیم برادر بزرگ‌تر و عصبی‌ترِ سدیمه! تو آب شدیدتر می‌ترکه. رادیواکتیو ضعیف طبیعیش داره — بدن تو از موز روزانه پتاسیم می‌گیره.",
+    clues: [
+      "موز برای تو داره، ولی خودش تو آب مثل ترکیدن بمب کوچیکه!",
+      "برادر بزرگ‌تر و عصبی‌ترِ سدیمه — گروه ۱ ولی دوره ۴",
+      "آرنج و عضلاتت بهش وابسته‌ست — کمبودش گرفتگی میاره",
+      "شعلش بنفشه — سخت‌ترین رنگ برای دیدن با چشم غیرمسلح",
+      "نمکش همون «پتاسیم» روی برچسب موزهاست!"
+    ]
+  },
+  {
+    day: 4, answer: "باریم", aliases: ["باريوم", "ba", "باریوم"],
+    symbol: "Ba", z: 56,
+    fun: "باریم گروه ۲ (خاکی‌ها) دوره ۶. سولفات نامحلولش تو رادیولوژی معروفه — «باریم میل» برای عکس معده. خود فلزش فوق‌العاده سمی‌ست!",
+    clues: [
+      "نمک خاصش تو رادیولوژی معروفه — ولی خود فلزش سمی خطرناکه!",
+      "به خانواده خاکی‌ها تعلق داره؛ سنگین‌وزنِ معروفِ گروه ۲",
+      "با سولفاتش معده رو عکس می‌گیرن — همون «باریم میل» معروف!",
+      "شعلش سبز روشنه — آتش‌بازی‌ها عاشقشن",
+      "حرف اول اسمش رو بگیر، ته اسمش «یوم» اضافه کن!"
+    ]
+  },
+  {
+    day: 5, answer: "استرانسیم", aliases: ["استرانسيوم", "sr", "استرانشیم"],
+    symbol: "Sr", z: 38,
+    fun: "استرانسیم گروه ۲ دوره ۵. قرمز آتش‌بازی‌ها کارشه! ایزوتوپ ۹۰ بدجنسش پسماند هسته‌ای معروفه. اسمش از دهکده Strontian اسکاتلند میاد.",
+    clues: [
+      "قرمزِ قرمزِ آتش‌بازی‌ها دست ساختشه",
+      "همسایه باریم و کلسیمه؛ خاکی ولی پرانرژی",
+      "ایزوتوپ ۹۰ بدجنسش پسماند هسته‌ای معروفه",
+      "استخوان‌ها عاشقش میشن چون شبیه کلسیمه — و همین خطرناکه!",
+      "اسمش از یه دهکده اسکاتلندی میاد: Strontian"
+    ]
+  },
+  {
+    day: 6, answer: "نئون", aliases: ["نئون", "ne", "نيون"],
+    symbol: "Ne", z: 10,
+    fun: "نئون گاز نجیب دوره ۲ با ۸ الکترون ظرفیت کامل — هیچ واکنشی نمی‌ده! لامپ‌های تبلیغاتی قرمز-نارنجی جهان از نور التهابش استفاده می‌کنن.",
+    clues: [
+      "خانواده‌اش به هیچ‌کس کاری ندارن — کامل‌ترین اکتت!",
+      "دوره ۲ ولی اصلاً سبک‌باله؛ از هلیوم سنگین‌تره",
+      "تابلوی تبلیغاتی قرمز-نارنجی شهر، نور التهابشه",
+      "اسمش از یونانی یعنی «جدید»",
+      "حروف اولش رو برعکس بخون: «نو ان»!"
+    ]
+  },
+  {
+    day: 7, answer: "کلسیم", aliases: ["كلسيم", "ca", "کلسیوم"],
+    symbol: "Ca", z: 20,
+    fun: "کلسیم گروه ۲ دوره ۴ — ۹۹٪ بدنت تو استخوانه! شعلش نارنجی-قرمزه. با آب واکنش ملایم‌تری از برادراش داره.",
+    clues: [
+      "۹۹٪ بدن تو از این عنصره — ولی تو استخوان، نه تو آزمایشگاه!",
+      "گروه ۲ دوره ۴ — همسایه پتاسیم و اسکاندیوم",
+      "شعلش نارنجی-قرمزه — شبیه آتیش کم‌جان",
+      "با آب واکنش می‌ده ولی خفه‌کننده نیست؛ ملایم‌تر از برادراش",
+      "اسمش از لاتین Calx یعنی «آهک» میاد!"
+    ]
+  }
+];
+
+/* ---- state ---- */
+const KEY = "shimidle_v1";
+const today = new Date();
+const dayIndex = Math.floor(today.getTime() / 86400000) % PUZZLES.length;
+const P = PUZZLES[dayIndex];
+
+let state = {
+  puzzleDay: P.day,
+  wrong: 0, hintsUsed: 0,
+  unlocked: 1, guesses: [],
+  solved: false, streak: 1, lastWinDay: null
+};
+
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && s.puzzleDay === P.day) state = { ...state, ...s };
+  } catch (e) {}
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+/* ---- render ---- */
+function fa(n) { return String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[+d]); }
+
+function renderClues() {
+  document.getElementById("clues").innerHTML = P.clues.map((c, i) => {
+    const unlocked = i < state.unlocked;
+    const current = i === state.unlocked - 1 && !state.solved;
+    return `<div class="clue ${unlocked ? "unlocked" : ""} ${current ? "current" : ""}">
+      <span class="n">${fa(i + 1)}</span>
+      <span class="txt">${unlocked ? c : "🔒 سرنخ قفل است"}</span>
+      ${unlocked ? "" : '<span class="lock">🔒</span>'}
+    </div>`;
+  }).join("");
+}
+
+function renderLog() {
+  document.getElementById("log").innerHTML = state.guesses.map(g =>
+    `<div class="log-item ${g.ok ? "good" : "bad"}">
+      <span class="x">${g.ok ? "✓" : "✕"}</span>
+      <span>${g.ok ? "درست بود!" : "«" + g.text + "» — نه، این نیست!"}</span>
+    </div>`).join("");
+}
+
+function checkGuess() {
+  const inp = document.getElementById("guessInput");
+  const val = inp.value.trim();
+  if (!val || state.solved) return;
+
+  const ok = P.aliases.includes(val) || val === P.answer;
+  state.guesses.push({ text: val, ok });
+
+  if (ok) {
+    state.solved = true;
+    state.streak = (state.lastWinDay === String(dayIndex - 1)) ? state.streak + 1 : 1;
+    state.lastWinDay = String(dayIndex);
+    haptic("medium");
+    renderResult();
+  } else {
+    state.wrong++;
+    if (state.unlocked < P.clues.length) state.unlocked++;
+    haptic("rigid");
+  }
+  inp.value = "";
+  save();
+  renderClues();
+  renderLog();
+}
+
+function showHint() {
+  if (state.unlocked < P.clues.length) {
+    state.unlocked++;
+    state.hintsUsed++;
+    haptic("light");
+    save();
+    renderClues();
+  }
+}
+
+function renderResult() {
+  const won = state.solved;
+  const box = document.getElementById("resultBox");
+  box.innerHTML = `
+    <div class="result ${won ? "win" : "lose"}">
+      <div class="emoji">${won ? "🎉" : "😅"}</div>
+      <h2 class="${won ? "w" : "l"}">${won ? "درست حدس زدی!" : "وقت تموم شد!"}</h2>
+      <div class="ans">عنصر روز: ${P.answer}</div>
+      <div class="sym">${P.symbol} · Z = ${fa(P.z)}</div>
+      <p>${P.fun}</p>
+      ${won ? `<div class="streak-pill">🔥 استریک: ${fa(state.streak)} روز پیاپی</div>` : ""}
+      <button class="hint-buy" id="shareBtn" style="background:rgba(56,189,248,.14);color:var(--accent)">
+        📤 به دوستانت چالش بفرست
+      </button>
+    </div>`;
+  document.getElementById("guessRow").style.display = "none";
+  document.getElementById("hintBtn").style.display = "none";
+  document.getElementById("shareBtn").onclick = () => {
+    const txt = won
+      ? `🧩 شیمیدل روز ${fa(P.day)} رو درست حدس زدم! (${fa(state.guesses.length)} حدس)\nتو هم امتحان کن: @shimi_mohamaddost`
+      : `🧩 شیمیدل امروز نگرفتم! بیا تو حدس بزن: @shimi_mohamaddost`;
+    if (TG) { try { TG.openTelegramLink("https://t.me/share/url?url=https://t.me/shimi_mohamaddost&text=" + encodeURIComponent(txt)); return; } catch(e){} }
+    window.open("https://t.me/share/url?url=https://t.me/shimi_mohamaddost&text=" + encodeURIComponent(txt), "_blank");
+  };
+}
+
+/* ---- init ---- */
+load();
+document.getElementById("dayPill").textContent = `پازل #${fa(P.day)} — ${new Date().toLocaleDateString("fa-IR", { weekday: "long", day: "numeric", month: "long" })}`;
+renderClues();
+renderLog();
+if (state.solved) renderResult();
+document.getElementById("guessBtn").onclick = checkGuess;
+document.getElementById("hintBtn").onclick = showHint;
+document.getElementById("guessInput").addEventListener("keydown", e => { if (e.key === "Enter") checkGuess(); });
+</script>
+</body>
+</html>
