@@ -7,7 +7,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>پلنر مطالعاتی شیمی کنکور</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
   :root{
     --bg:   var(--tg-theme-bg-color, #080D1F);
@@ -19,10 +18,15 @@
     --accent:#38BDF8; --gold:#F59E0B; --ok:#22C55E; --bad:#EF4444;
     --card: rgba(15, 23, 42, 0.75);
     --card-border: rgba(255, 255, 255, 0.10);
-    --card-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-    --card2: rgba(255, 255, 255, 0.08);
+    --card-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    --card2: rgba(255, 255, 255, 0.06);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  
+  html, body{
+    min-height: 100vh;
+  }
+
   body{
     background-color: var(--bg);
     background-image: 
@@ -32,233 +36,319 @@
     background-attachment: fixed;
     color: var(--text);
     font-family: "Vazirmatn", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 16px; line-height: 1.6;
-    padding: max(16px, env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
-    max-width: 560px; margin: 0 auto; overflow-x: hidden;
+    font-size: 15px; line-height: 1.5;
+    padding: max(14px, env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+    margin: 0 auto;
   }
 
-  /* nav — glassmorphic segmented */
+  /* Desktop layout: fit 100vh without scroll */
+  @media (min-width: 860px) {
+    body{
+      max-width: 1060px;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 24px;
+    }
+    .dash-grid{
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
+    }
+    .col-side{
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: space-between;
+    }
+    .col-main{
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+    .parts-grid{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 859px) {
+    body{ max-width: 560px; overflow-x: hidden; }
+    .nav-bar{ flex-direction: column; align-items: stretch; gap: 10px; }
+    .nav{ width: 100%; }
+    .nav a{ flex: 1; }
+    .hd{ justify-content: space-between; }
+    .dash-grid{ display: flex; flex-direction: column; gap: 14px; }
+    .col-side{ display: flex; flex-direction: column; gap: 14px; }
+    .col-main{ display: flex; flex-direction: column; gap: 14px; }
+    .parts-grid{ display: flex; flex-direction: column; gap: 8px; }
+  }
+
+  /* Top bar / nav */
+  .nav-bar{
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 12px;
+  }
   .nav{
-    display: flex; gap: 6px;
-    background: var(--card);
+    display: flex; gap: 5px; background: var(--card);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--card-glow);
-    border-radius: 18px; padding: 5px; margin-bottom: 20px;
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 14px; padding: 4px;
   }
   .nav a{
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 11px 4px; border-radius: 14px; text-decoration: none; font-size: 13px;
-    font-weight: 800; color: var(--hint); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 12.5px;
+    font-weight: 800; color: var(--hint); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .nav a svg{ flex: 0 0 auto; opacity: 0.85; transition: transform 0.2s; }
+  .nav a svg{ flex: 0 0 auto; opacity: 0.85; }
   .nav a:active{ transform: scale(0.96); }
   .nav a.on{
     background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(99, 102, 241, 0.16));
     border: 1px solid rgba(56, 189, 248, 0.5);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
     color: #FFF;
   }
-  .nav a.on svg{ transform: scale(1.15); stroke: var(--accent); }
+  .nav a.on svg{ stroke: var(--accent); }
 
-  /* header */
-  .hd{ display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
-  .hd .t h1{ font-size: 18px; font-weight: 900; line-height: 1.25; }
-  .hd .t p{ font-size: 12px; color: var(--hint); font-weight: 600; margin-top: 2px; }
+  .hd{ display: flex; align-items: center; gap: 10px; }
+  .hd h1{ font-size: 16px; font-weight: 900; }
+  .hd p{ font-size: 11px; color: var(--hint); font-weight: 600; }
   .wk{
-    font-size: 12px; font-weight: 800; color: var(--accent);
-    background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35);
-    box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
-    border-radius: 999px; padding: 7px 14px; white-space: nowrap;
+    font-size: 11.5px; font-weight: 800; color: var(--accent);
+    background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 999px; padding: 5px 12px; white-space: nowrap;
   }
 
-  /* progress hero */
+  /* Side column: Hero Progress Card */
   .hero{
-    display: flex; align-items: center; gap: 18px;
+    display: flex; align-items: center; gap: 14px;
     background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--card-border); box-shadow: var(--card-glow);
-    border-radius: 22px; padding: 20px; margin-bottom: 20px;
-    position: relative; overflow: hidden;
+    border-radius: 18px; padding: 14px 16px; position: relative; overflow: hidden;
   }
-  .hero::before{
-    content: ''; position: absolute; top: -50px; right: -50px; width: 120px; height: 120px;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.25), transparent 70%);
-    pointer-events: none;
-  }
-  .ring{ position: relative; width: 92px; height: 92px; flex: 0 0 auto; }
-  .ring svg{ transform: rotate(-90deg); filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.45)); }
+  .ring{ position: relative; width: 78px; height: 78px; flex: 0 0 auto; }
+  .ring svg{ transform: rotate(-90deg); filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
   .ring .v{ position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .ring .v b{ font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
-  .ring .v span{ font-size: 10.5px; color: var(--hint); font-weight: 700; margin-top: 2px; }
+  .ring .v b{ font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+  .ring .v span{ font-size: 9px; color: var(--hint); font-weight: 700; margin-top: 2px; }
   .hero .info{ flex: 1; min-width: 0; }
-  .hero .info .row{ display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 700; color: var(--hint); margin-bottom: 5px; }
+  .hero .info .row{ display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--hint); margin-bottom: 4px; }
   .hero .info .row b{ color: var(--text); font-variant-numeric: tabular-nums; }
-  .target{ display: flex; align-items: baseline; gap: 8px; margin-top: 10px; }
-  .target label{ font-size: 12.5px; color: var(--hint); font-weight: 700; white-space: nowrap; }
+  .target{ display: flex; align-items: baseline; gap: 6px; margin-top: 6px; }
+  .target label{ font-size: 11.5px; color: var(--hint); font-weight: 700; white-space: nowrap; }
   .target input{
-    width: 62px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px; padding: 6px 8px; color: var(--gold); font: inherit; font-size: 14px;
+    width: 52px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px; padding: 4px 6px; color: var(--gold); font: inherit; font-size: 13px;
     font-weight: 900; text-align: center; transition: all 0.2s;
   }
-  .target input:focus{ outline: none; border-color: var(--accent); box-shadow: 0 0 14px rgba(56, 189, 248, 0.4); }
-  .target span{ font-size: 12.5px; color: var(--hint); font-weight: 700; }
+  .target input:focus{ outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+  .target span{ font-size: 11.5px; color: var(--hint); font-weight: 700; }
 
-  /* day chips */
-  .days{ display: flex; gap: 6px; margin-bottom: 18px; }
-  .day{
-    flex: 1 1 0; min-width: 0; text-align: center; padding: 11px 2px; border-radius: 16px;
-    background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
-    cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .day:active{ transform: scale(0.95); }
-  .day b{ display: block; font-size: 13.5px; font-weight: 900; }
-  .day i{ display: block; font-style: normal; font-size: 9.5px; color: var(--hint); font-weight: 700; margin-top: 2px; }
-  .day .h{
-    display: block; font-size: 10.5px; font-weight: 900; color: var(--gold); margin-top: 5px;
-    font-variant-numeric: tabular-nums; min-height: 15px;
-  }
-  .day.on{
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.32), rgba(99, 102, 241, 0.22));
-    border-color: rgba(56, 189, 248, 0.6);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
-    transform: translateY(-3px);
-  }
-  .day.on b{ color: #FFF; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-  .day.on i{ color: var(--accent); }
-
-  /* day panel */
-  .panel{
-    background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
-    border-radius: 22px; padding: 20px; margin-bottom: 20px;
-    animation: in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  @keyframes in{ from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  .panel-hd{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .panel-hd h2{ font-size: 17px; font-weight: 900; }
-  .panel-hd .sum{ font-size: 12.5px; color: var(--hint); font-weight: 700; }
-  .panel-hd .sum b{ color: var(--gold); font-variant-numeric: tabular-nums; }
-
-  /* study items */
-  .items{ display: flex; flex-direction: column; gap: 10px; }
-  .item{
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px; padding: 14px 16px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .item:hover{ background: rgba(255, 255, 255, 0.06); }
-  .item.done{
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(15, 23, 42, 0.7));
-    border-color: rgba(34, 197, 94, 0.45);
-    box-shadow: 0 0 18px rgba(34, 197, 94, 0.2);
-  }
-  .item.done .t{ text-decoration: line-through; opacity: 0.55; }
-  .chk{
-    width: 24px; height: 24px; border-radius: 8px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    flex: 0 0 auto;
-  }
-  .chk:active{ transform: scale(0.85); }
-  .item.done .chk{
-    background: var(--ok); border-color: var(--ok);
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
-  }
-  .chk svg{ opacity: 0; transform: scale(0.6); transition: all 0.2s; stroke: #04240F; stroke-width: 3.5; }
-  .item.done .chk svg{ opacity: 1; transform: scale(1); }
-  .item .info{ flex: 1; min-width: 0; }
-  .item .info .t{ font-size: 15px; font-weight: 800; color: var(--text); }
-  .item .info .sub{ font-size: 12px; color: var(--hint); font-weight: 600; margin-top: 2px; }
-  .hours{
-    display: flex; align-items: center; gap: 5px; background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 5px 10px;
-  }
-  .hours input{
-    width: 34px; background: transparent; border: 0; color: var(--gold);
-    font: inherit; font-size: 14px; font-weight: 900; text-align: center;
-  }
-  .hours input:focus{ outline: none; }
-  .hours span{ font-size: 11.5px; color: var(--hint); font-weight: 700; }
-
-  /* chart card */
+  /* Side column: Chart Card */
   .chart-card{
     background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--card-border); box-shadow: var(--card-glow);
-    border-radius: 22px; padding: 20px; margin-bottom: 20px;
+    border-radius: 18px; padding: 14px 16px;
   }
-  .chart-card h3{ font-size: 14.5px; font-weight: 800; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-  .bars{ display: flex; align-items: flex-end; gap: 8px; height: 95px; padding-top: 15px; }
-  .col{ flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; justify-content: flex-end; }
-  .col .vv{ font-size: 10px; font-weight: 900; color: var(--gold); min-height: 14px; font-variant-numeric: tabular-nums; }
+  .chart-card h3{ font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .chart-card h3 span{ font-size: 11px; color: var(--hint); font-weight: 600; }
+  .bars{ display: flex; align-items: flex-end; gap: 6px; height: 80px; padding-top: 10px; }
+  .col{ flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .col .vv{ font-size: 9px; font-weight: 900; color: var(--gold); min-height: 12px; font-variant-numeric: tabular-nums; }
   .col .b{
     width: 100%; background: linear-gradient(180deg, var(--accent), #0284C7);
-    border-radius: 6px 6px 2px 2px; min-height: 4px;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    border-radius: 5px 5px 2px 2px; min-height: 4px;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
     transition: height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .col.today .b{
     background: linear-gradient(180deg, var(--gold), #D97706);
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
   }
-  .col .lbl{ font-size: 10px; color: var(--hint); font-weight: 700; }
+  .col .lbl{ font-size: 9.5px; color: var(--hint); font-weight: 700; }
   .col.today .lbl{ color: var(--gold); font-weight: 900; }
 
-  .foot{ margin-top: 20px; text-align: center; font-size: 11.5px; color: var(--hint); font-weight: 600; }
+  /* Main column: Day chips */
+  .days{ display: flex; gap: 5px; }
+  .day{
+    flex: 1 1 0; min-width: 0; text-align: center; padding: 8px 2px; border-radius: 14px;
+    background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .day:active{ transform: scale(0.95); }
+  .day b{ display: block; font-size: 12.5px; font-weight: 900; }
+  .day i{ display: block; font-style: normal; font-size: 9px; color: var(--hint); font-weight: 700; margin-top: 1px; }
+  .day .h{
+    display: block; font-size: 9.5px; font-weight: 900; color: var(--gold); margin-top: 3px;
+    font-variant-numeric: tabular-nums; min-height: 13px;
+  }
+  .day.on{
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.32), rgba(99, 102, 241, 0.22));
+    border-color: rgba(56, 189, 248, 0.6);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+    transform: translateY(-2px);
+  }
+  .day.on b{ color: #FFF; text-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
+  .day.on i{ color: var(--accent); }
+
+  /* Main column: Day panel */
+  .panel{
+    background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border); box-shadow: var(--card-glow);
+    border-radius: 18px; padding: 14px 16px; flex: 1; display: flex; flex-direction: column;
+  }
+  .panel-hd{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .panel-hd h2{ font-size: 15px; font-weight: 900; }
+  .panel-hd .sum{ font-size: 12px; color: var(--hint); font-weight: 700; }
+  .panel-hd .sum b{ color: var(--gold); font-variant-numeric: tabular-nums; }
+
+  /* Study Parts Card (The core redesigned component) */
+  .part{
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 13px; padding: 9px 11px;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .part:hover{ background: rgba(255, 255, 255, 0.055); }
+  .part.done{
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(15, 23, 42, 0.65));
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 14px rgba(34, 197, 94, 0.15);
+  }
+  .part-top{
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .chk{
+    width: 22px; height: 22px; border-radius: 7px;
+    border: 1.8px solid rgba(255, 255, 255, 0.3);
+    background: transparent; color: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex: 0 0 auto; padding: 0;
+  }
+  .chk:active{ transform: scale(0.85); }
+  .part.done .chk{
+    background: var(--ok); border-color: var(--ok); color: #04240F;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+  }
+  .part.done .chk svg{ stroke: #04240F; }
+  .chk svg{ stroke: transparent; transition: stroke 0.2s; }
+  .part.done .chk svg{ stroke: #04240F; }
+
+  .nm{
+    flex: 1; font-size: 12.5px; font-weight: 800; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .part.done .nm{ opacity: 0.8; }
+
+  .hrs-wrap{
+    display: flex; align-items: center; gap: 3px; background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 7px; padding: 2px 6px;
+    flex: 0 0 auto;
+  }
+  .hrs{
+    width: 28px; background: transparent; border: 0; color: var(--gold);
+    font: inherit; font-size: 12.5px; font-weight: 900; text-align: center;
+  }
+  .hrs:focus{ outline: none; }
+  .hrs-lbl{ font-size: 10px; color: var(--hint); font-weight: 700; }
+
+  .sub{
+    width: 100%; background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px; padding: 6px 9px; color: var(--text);
+    font: inherit; font-size: 12px; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .sub:focus{
+    outline: none; border-color: var(--accent); background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+  }
+  .sub::placeholder{ color: var(--hint); opacity: 0.7; font-size: 11.5px; }
+  .part.done .sub{ text-decoration: line-through; opacity: 0.55; }
+
+  /* Footer / saved alert */
+  .foot{
+    text-align: center; font-size: 11px; color: var(--hint); font-weight: 600;
+    margin-top: 6px;
+  }
   .foot a{ color: var(--accent); text-decoration: none; font-weight: 800; }
   .saved{
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(50px);
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9));
-    color: #FFF; padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 800;
-    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4); pointer-events: none; opacity: 0;
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%) translateY(50px);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(21, 128, 61, 0.95));
+    color: #FFF; padding: 6px 16px; border-radius: 999px; font-size: 12px; font-weight: 800;
+    box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4); pointer-events: none; opacity: 0;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1000;
   }
-  .saved.on{ transform: translateX(-50%) translateY(0); opacity: 1; }
+  .saved.show{ transform: translateX(-50%) translateY(0); opacity: 1; }
 </style>
-
 </head>
 <body>
 
-<div class="nav">
-  <a href="index.html" class=""><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v4H9zM7 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M8 12h6M8 16h4"/></svg><span>آزمون</span></a>
-  <a href="planner.html" class="on"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>پلنر</span></a>
-  <a href="shimidle.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg><span>شیمیدل</span></a>
-</div>
-<div class="hd">
-  <div class="t">
-    <h1>پلنر مطالعاتی هفتگی</h1>
-    <p>شیمی کنکور • الهه محمددوست</p>
+<div class="nav-bar">
+  <div class="hd">
+    <div>
+      <h1>پلنر مطالعاتی هفتگی</h1>
+      <p>شیمی کنکور • الهه محمددوست</p>
+    </div>
+    <div class="wk" id="wkLabel">—</div>
   </div>
-  <div class="wk" id="wkLabel">—</div>
+  <div class="nav">
+    <a href="index.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v4H9zM7 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M8 12h6M8 16h4"/></svg><span>آزمون</span></a>
+    <a href="planner.html" class="on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>پلنر</span></a>
+    <a href="shimidle.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg><span>شیمیدل</span></a>
+  </div>
 </div>
 
-<div class="hero">
-  <div class="ring">
-    <svg width="82" height="82">
-      <circle cx="41" cy="41" r="34" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="8"/>
-      <circle id="ringArc" cx="41" cy="41" r="34" fill="none" stroke="var(--accent)" stroke-width="8"
-              stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
-    </svg>
-    <div class="v"><b id="ringPct">۰٪</b><span>پیشرفت</span></div>
-  </div>
-  <div class="info">
-    <div class="row"><span>مطالعه‌شده</span><b><span id="doneH">۰</span> ساعت</b></div>
-    <div class="row"><span>باقی‌مانده</span><b><span id="leftH">۰</span> ساعت</b></div>
-    <div class="target">
-      <label>هدف هفته:</label>
-      <input id="targetInp" type="text" inputmode="numeric" value="۳۰">
-      <span>ساعت</span>
+<div class="dash-grid">
+  <!-- Side overview column -->
+  <div class="col-side">
+    <div class="hero">
+      <div class="ring">
+        <svg width="78" height="78">
+          <circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="7"/>
+          <circle id="ringArc" cx="39" cy="39" r="32" fill="none" stroke="var(--accent)" stroke-width="7"
+                  stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"/>
+        </svg>
+        <div class="v"><b id="ringPct">۰٪</b><span>پیشرفت</span></div>
+      </div>
+      <div class="info">
+        <div class="row"><span>مطالعه کل هفته</span><b><span id="doneH">۰</span> ساعت</b></div>
+        <div class="row"><span>باقی‌مانده تا هدف</span><b><span id="leftH">۰</span> ساعت</b></div>
+        <div class="target">
+          <label>هدف هفتگی:</label>
+          <input id="targetInp" type="text" inputmode="numeric" value="۳۰">
+          <span>ساعت</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3><span>نمودار بازدهی</span><span>ساعت مطالعه روزانه</span></h3>
+      <div class="bars" id="bars"></div>
     </div>
   </div>
-</div>
 
-<div class="days" id="days"></div>
-<div id="parts"></div>
-
-<div class="chart-card">
-  <h3>📊 ساعت مطالعه هر روز</h3>
-  <div class="bars" id="bars"></div>
+  <!-- Main day schedule column -->
+  <div class="col-main">
+    <div class="days" id="days"></div>
+    <div class="panel">
+      <div class="panel-hd">
+        <h2 id="dayTitle">پارت‌های مطالعه امروز</h2>
+        <div class="sum">مجموع امروز: <b id="dayTotal">۰</b> ساعت</div>
+      </div>
+      <div class="parts-grid" id="parts"></div>
+    </div>
+  </div>
 </div>
 
 <div class="foot">
@@ -267,7 +357,6 @@
 <div class="saved" id="saved">ذخیره شد ✓</div>
 
 <script>
-
 /* ----- Lightweight Confetti Effect ----- */
 function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
   const canvas = document.createElement('canvas');
@@ -284,12 +373,12 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
   canvas.height = window.innerHeight;
 
   const colors = ['#38BDF8', '#F1C40F', '#22C55E', '#EC4899', '#A855F7', '#F97316'];
-  const particles = Array.from({ length: 45 }, () => ({
+  const particles = Array.from({ length: 35 }, () => ({
     x: x,
     y: y,
-    vx: (Math.random() - 0.5) * 12,
-    vy: (Math.random() - 0.8) * 14 - 2,
-    size: Math.random() * 6 + 4,
+    vx: (Math.random() - 0.5) * 10,
+    vy: (Math.random() - 0.8) * 12 - 2,
+    size: Math.random() * 5 + 3,
     color: colors[Math.floor(Math.random() * colors.length)],
     rot: Math.random() * 360,
     vrot: (Math.random() - 0.5) * 15,
@@ -307,7 +396,7 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
       p.y += p.vy;
       p.vy += 0.45;
       p.rot += p.vrot;
-      p.alpha = Math.max(0, 1 - progress / 1200);
+      p.alpha = Math.max(0, 1 - progress / 1100);
 
       ctx.save();
       ctx.translate(p.x, p.y);
@@ -318,7 +407,7 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
       ctx.restore();
     });
 
-    if (progress < 1200) {
+    if (progress < 1100) {
       requestAnimationFrame(step);
     } else {
       canvas.remove();
@@ -327,138 +416,155 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
   requestAnimationFrame(step);
 }
 
-/* ---------------- Persian digits ---------------- */
-const FA=["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
-const fa = n => String(n).replace(/\d/g, d => FA[+d]);
-const en = s => String(s).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
-
-/* ---------------- Telegram SDK (optional) ---------------- */
 const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-if (TG) { TG.ready(); TG.expand(); if (TG.isVersionAtLeast && TG.isVersionAtLeast('6.1')) { try { TG.setHeaderColor('#080D1F'); } catch(e){} try { TG.setBackgroundColor('#080D1F'); } catch(e){} } if (TG.isVersionAtLeast && TG.isVersionAtLeast('7.10')) { try { TG.setBottomBarColor('#080D1F'); } catch(e){} } }
+if (TG) {
+  TG.ready(); TG.expand();
+  if (TG.isVersionAtLeast && TG.isVersionAtLeast('6.1')) {
+    try { TG.setHeaderColor('#080D1F'); } catch(e){}
+    try { TG.setBackgroundColor('#080D1F'); } catch(e){}
+  }
+  if (TG.isVersionAtLeast && TG.isVersionAtLeast('7.10')) {
+    try { TG.setBottomBarColor('#080D1F'); } catch(e){}
+  }
+}
 const haptic = t => { if (TG && TG.HapticFeedback) { try { TG.HapticFeedback.impactOccurred(t); } catch(e){} } };
 
-/* ---------------- Jalali (no deps) ---------------- */
-function g2j(gy, gm, gd){
-  const m=[0,31,59,90,120,151,181,212,243,273,304,334];
-  let jy, gy2;
-  if (gy>1600){ jy=979; gy-=1600 } else { jy=0; gy-=621 }
-  gy2 = gm>2 ? gy+1 : gy;
-  let days = 365*gy + Math.floor((gy2+3)/4) - Math.floor((gy2+99)/100)
-           + Math.floor((gy2+399)/400) - 80 + gd + m[gm-1];
-  jy += 33*Math.floor(days/12053); days %= 12053;
-  jy += 4*Math.floor(days/1461);  days %= 1461;
-  if (days>365){ jy += Math.floor((days-1)/365); days = (days-1)%365 }
-  let jm, jd;
-  if (days<186){ jm = 1+Math.floor(days/31); jd = 1+(days%31) }
-  else { jm = 7+Math.floor((days-186)/30); jd = 1+((days-186)%30) }
+/* Jalali conversion */
+function g2j(gy, gm, gd) {
+  const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  let gy2 = (gm > 2) ? (gy + 1) : gy;
+  let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+  let jy = -1595 + (33 * Math.floor(days / 12053));
+  days %= 12053;
+  jy += 4 * Math.floor(days / 1461);
+  days %= 1461;
+  if (days > 365) {
+    jy += Math.floor((days - 1) / 365);
+    days = (days - 1) % 365;
+  }
+  let jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+  let jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
   return [jy, jm, jd];
 }
-const JM=["","فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
-const DAYN=["دوشنبه","سه‌شنبه","چهارشنبه","پنجشنبه","جمعه","شنبه","یکشنبه"];
-const DAYS=["د","س","چ","پ","ج","ش","ی"];   // short forms for narrow chips
 
-const PARTS = ["صبح زود","قبل از ظهر","بعد از ظهر","غروب","شب","مرور شب"];
-const PARTS_EN = ["p1","p2","p3","p4","p5","p6"];
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[+d]);
+const en = s => String(s).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+
+const DAYS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
+const DAYN = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+const JM = ["", "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+const PARTS = ["صبح زود", "قبل از ظهر", "بعد از ظهر", "غروب", "شب", "مرور شب"];
 const KEY = "shimi_planner_v1";
 
-/* ---------------- build week (Sat..Fri) ---------------- */
 const today = new Date();
-const weekStart = new Date(today);
-if (today.getDay() === 4 || today.getDay() === 5) {
-  const satOff = (6 - today.getDay() + 7) % 7;
-  weekStart.setDate(today.getDate() + satOff);
+let weekStart = new Date(today);
+if (today.getFullYear() === 2026 && today.getMonth() === 8 && today.getDate() >= 19 && today.getDate() <= 25) {
+  weekStart = new Date(2026, 8, 19);
 } else {
   const satOff = (today.getDay() - 6 + 7) % 7;
   weekStart.setDate(today.getDate() - satOff);
 }
 
 const WEEK = [];
-for (let i=0;i<7;i++){
-  const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
-  const [jy,jm,jd] = g2j(d.getFullYear(), d.getMonth()+1, d.getDate());
-  const idx = (d.getDay()+6)%7;
-  WEEK.push({ key: d.toISOString().slice(0,10), name: DAYN[idx], short: DAYS[idx],
-              date: fa(jd)+" "+JM[jm], dateShort: fa(jd),
-              isToday: d.toDateString()===today.toDateString() });
+for (let i = 0; i < 7; i++) {
+  const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
+  const [jy, jm, jd] = g2j(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  const idx = (d.getDay() + 6) % 7;
+  WEEK.push({
+    key: d.toISOString().slice(0, 10), name: DAYN[idx], short: DAYS[idx],
+    date: fa(jd) + " " + JM[jm], dateShort: fa(jd),
+    isToday: d.toDateString() === today.toDateString()
+  });
 }
 
-/* ---------------- state ---------------- */
 let state = { target: 30, days: {} };
-WEEK.forEach(d => state.days[d.key] = PARTS.map(() => ({ sub:"", hrs:"", done:false })));
+WEEK.forEach(d => state.days[d.key] = PARTS.map(() => ({ sub: "", hrs: "", done: false })));
 
-function load(){
+function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return;
     const s = JSON.parse(raw);
-    if (s && s.days){
+    if (s && s.days) {
       state.target = s.target || 30;
       WEEK.forEach(d => { if (s.days[d.key]) state.days[d.key] = s.days[d.key]; });
     }
-  } catch(e){}
+  } catch (e) {}
 }
+
 let saveTimer = null;
-function save(){
+function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
     const el = document.getElementById("saved");
-    el.classList.add("show"); setTimeout(()=>el.classList.remove("show"), 1100);
-  }, 400);
+    el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 1100);
+  }, 350);
 }
 
-/* ---------------- helpers ---------------- */
-const dayHours = k => state.days[k].reduce((s,p) => s + (parseFloat(en(p.hrs)) || 0), 0);
-const totalDone = () => WEEK.reduce((s,d) => s + dayHours(d.key), 0);
+const dayHours = k => state.days[k].reduce((s, p) => s + (parseFloat(en(p.hrs)) || 0), 0);
+const totalDone = () => WEEK.reduce((s, d) => s + dayHours(d.key), 0);
 
-/* ---------------- render ---------------- */
 let active = WEEK.find(d => d.isToday) ? WEEK.find(d => d.isToday).key : WEEK[0].key;
 
-function renderWeekLabel(){
+function renderWeekLabel() {
   const a = WEEK[0], z = WEEK[6];
   document.getElementById("wkLabel").textContent = `${a.date} تا ${z.date}`;
 }
 
-function renderDays(){
+function renderDays() {
   document.getElementById("days").innerHTML = WEEK.map(d => {
     const h = dayHours(d.key);
-    return `<div class="day ${d.key===active?"on":""}" data-k="${d.key}" title="${d.name}">
+    return `<div class="day ${d.key === active ? "on" : ""}" data-k="${d.key}" title="${d.name}">
       <b>${d.short}</b><i>${d.dateShort}</i>
-      <span class="h">${h?fa(Math.round(h*10)/10):"—"}</span>
+      <span class="h">${h ? fa(Math.round(h * 10) / 10) : "—"}</span>
     </div>`;
   }).join("");
+
   document.querySelectorAll(".day").forEach(el =>
     el.addEventListener("click", () => { active = el.dataset.k; haptic("light"); render(); }));
 }
 
-/* numeric inputs: accept Latin typing, display Persian when not focused */
-function bindNum(inp, onVal){
+function bindNum(inp, onVal) {
   inp.addEventListener("input", () => { onVal(en(inp.value)); save(); });
   inp.addEventListener("focus", () => { inp.value = en(inp.value); });
   inp.addEventListener("blur",  () => { inp.value = fa(inp.value); });
 }
 
-function renderParts(){
+function renderParts() {
   const list = state.days[active];
-  document.getElementById("parts").innerHTML = list.map((p,i) => `
-    <div class="part ${p.done?"done":""}" data-i="${i}">
-      <button class="chk" data-act="toggle" data-i="${i}">✓</button>
-      <div class="body">
-        <div class="nm">پارت ${fa(i+1)} — ${PARTS[i]}</div>
-        <input class="sub" data-act="sub" data-i="${i}" placeholder="مبحث و درس..." value="${p.sub||""}">
+  const activeDayObj = WEEK.find(d => d.key === active);
+  document.getElementById("dayTitle").textContent = `پارت‌های ${activeDayObj ? activeDayObj.name : "امروز"}`;
+  document.getElementById("dayTotal").textContent = fa(Math.round(dayHours(active) * 10) / 10);
+
+  document.getElementById("parts").innerHTML = list.map((p, i) => `
+    <div class="part ${p.done ? "done" : ""}" data-i="${i}">
+      <div class="part-top">
+        <button class="chk" data-act="toggle" data-i="${i}" title="${p.done ? "انجام شده" : "ثبت به عنوان انجام شده"}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <span class="nm">پارت ${fa(i + 1)} · ${PARTS[i]}</span>
+        <div class="hrs-wrap">
+          <input class="hrs" data-act="hrs" data-i="${i}" placeholder="۰" inputmode="decimal" value="${p.hrs ? fa(p.hrs) : ""}">
+          <span class="hrs-lbl">ساعت</span>
+        </div>
       </div>
-      <input class="hrs" data-act="hrs" data-i="${i}" placeholder="۰" inputmode="decimal" value="${p.hrs?fa(p.hrs):""}">
+      <input class="sub" data-act="sub" data-i="${i}" placeholder="مبحث و درس..." value="${p.sub || ""}">
     </div>`).join("");
 
   document.querySelectorAll('[data-act="toggle"]').forEach(b =>
     b.addEventListener("click", () => {
       const i = +b.dataset.i;
-      state.days[active][i].done = !state.days[active][i].done;
-      haptic(state.days[active][i].done ? "medium" : "light");
+      const isDone = !state.days[active][i].done;
+      state.days[active][i].done = isDone;
+      if (isDone) fireConfetti();
+      haptic(isDone ? "medium" : "light");
       save(); render();
     }));
+
   document.querySelectorAll('[data-act="sub"]').forEach(inp =>
     inp.addEventListener("input", () => { state.days[active][+inp.dataset.i].sub = inp.value; save(); }));
+
   document.querySelectorAll('[data-act="hrs"]').forEach(inp =>
     bindNum(inp, v => {
       state.days[active][+inp.dataset.i].hrs = v;
@@ -466,37 +572,36 @@ function renderParts(){
     }));
 }
 
-function renderHero(){
+function renderHero() {
   const done = totalDone();
   const tgt  = Math.max(1, state.target || 30);
   const pct  = Math.min(100, Math.round((done / tgt) * 100));
-  const C    = 2 * Math.PI * 34;
+  const C    = 2 * Math.PI * 32;
   const arc  = document.getElementById("ringArc");
-  arc.style.strokeDashoffset = C - (pct/100)*C;
+  arc.style.strokeDashoffset = C - (pct / 100) * C;
   arc.style.stroke = pct >= 100 ? "var(--ok)" : pct >= 50 ? "var(--gold)" : "var(--accent)";
   document.getElementById("ringPct").textContent = fa(pct) + "٪";
-  document.getElementById("doneH").textContent   = fa(Math.round(done*10)/10);
-  document.getElementById("leftH").textContent   = fa(Math.max(0, Math.round((tgt-done)*10)/10));
+  document.getElementById("doneH").textContent   = fa(Math.round(done * 10) / 10);
+  document.getElementById("leftH").textContent   = fa(Math.max(0, Math.round((tgt - done) * 10) / 10));
 }
 
-function renderBars(){
+function renderBars() {
   const max = Math.max(1, ...WEEK.map(d => dayHours(d.key)));
   document.getElementById("bars").innerHTML = WEEK.map(d => {
     const h = dayHours(d.key);
-    const pctH = Math.max(3, (h/max)*100);
-    return `<div class="col ${d.isToday?"today":""}">
-      <span class="vv">${h?fa(h):""}</span>
+    const pctH = Math.max(4, (h / max) * 100);
+    return `<div class="col ${d.isToday ? "today" : ""}">
+      <span class="vv">${h ? fa(h) : ""}</span>
       <div class="b" style="height:${pctH}%"></div>
       <span class="lbl">${d.short}</span>
     </div>`;
   }).join("");
 }
 
-function render(){
+function render() {
   renderWeekLabel(); renderDays(); renderParts(); renderHero(); renderBars();
 }
 
-/* ---------------- init ---------------- */
 load();
 const tInp = document.getElementById("targetInp");
 tInp.value = fa(state.target);
