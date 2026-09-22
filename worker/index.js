@@ -1,7 +1,6 @@
 // Telegram webhook handler — cloud 24/7 bot (no local Mac dependency)
 // Free tier: 125k requests/month, far beyond our usage.
 
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_IDS = [5207128978, 6712714529];
 const GROUP_ID = -1003989699975;
 const CHANNEL_ID = -1003792488519;
@@ -355,20 +354,53 @@ const CLOSERS = [
 
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-export async function handler(event) {
-  if (event.httpMethod === "GET") {
-    return {statusCode: 200, body: "Telegram webhook endpoint is live. Use POST."};
-  }
-  if (event.httpMethod !== "POST") {
-    return {statusCode: 405, body: "Method Not Allowed"};
-  }
+let TOKEN;
+const res = (body, status = 200) => new Response(body, {status});
 
-  let update;
-  try {
-    update = JSON.parse(event.body);
-  } catch (e) {
-    return {statusCode: 200, body: "bad json"};
-  }
+export default {
+  async fetch(request, env) {
+    TOKEN = env.TELEGRAM_BOT_TOKEN;
+
+    const url = new URL(request.url);
+    const key = url.searchParams.get("key");
+
+    // admin routes (guard: key must match the ADMIN_KEY binding)
+    if (request.method === "GET" && env.ADMIN_KEY && key === env.ADMIN_KEY) {
+      if (url.pathname === "/setwebhook") {
+        const target = url.origin + "/";
+        const r = await tg("setWebhook", {
+          url: target,
+          allowed_updates: ["message", "callback_query", "my_chat_member"],
+          secret_token: env.WEBHOOK_SECRET || undefined,
+          drop_pending_updates: false,
+        });
+        return res(JSON.stringify({setWebhook: r, url: target}), 200);
+      }
+      if (url.pathname === "/status") {
+        const r = await tg("getWebhookInfo", {});
+        return res(JSON.stringify(r), 200);
+      }
+    }
+
+    if (request.method === "GET") {
+      return res("Telegram webhook endpoint is live. Use POST.");
+    }
+    if (request.method !== "POST") {
+      return res("Method Not Allowed", 405);
+    }
+    // trust boundary: only accept updates carrying Telegram's secret header
+    if (env.WEBHOOK_SECRET &&
+        request.headers.get("x-telegram-bot-api-secret-token") !== env.WEBHOOK_SECRET) {
+      return res("forbidden", 403);
+    }
+
+    const body = await request.text();
+    let update;
+    try {
+      update = JSON.parse(body);
+    } catch (e) {
+      return res("bad json");
+    }
 
   try {
     // callback query (approve / reject buttons)
@@ -382,7 +414,7 @@ export async function handler(event) {
 
       if (!ADMIN_IDS.includes(fromId)) {
         await tg("sendMessage", {chat_id: chatId, text: "⛔️ فقط ادمین‌های مجاز اجازه استفاده از این دکمه را دارند."});
-        return {statusCode: 200, body: "ok"};
+        return res("ok", 200);
       }
 
       if (data.startsWith("pub_")) {
@@ -418,7 +450,7 @@ export async function handler(event) {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
           text: `✍️ لطفاً علت رد یا اصلاحات مورد نظر برای «<b>${ASSETS[key]?.caption.slice(0, 50)}</b>» را ارسال کنید:`});
       }
-      return {statusCode: 200, body: "ok"};
+      return res("ok", 200);
     }
 
     // incoming message (commands / keyboard buttons)
@@ -454,17 +486,17 @@ export async function handler(event) {
           break;
         }
       }
-      if (roasted) return {statusCode: 200, body: "ok"};
+      if (roasted) return res("ok", 200);
 
       // only react to admins for commands
-      if (!ADMIN_IDS.includes(fromId)) return {statusCode: 200, body: "ok"};
+      if (!ADMIN_IDS.includes(fromId)) return res("ok", 200);
 
       if (text.startsWith("/start") || text.startsWith("/panel") || text.startsWith("/menu") || text === "منو" || text === "پنل") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", reply_markup: MAIN_KEYBOARD,
-          text: "👋 <b>پنل مدیریت ابری شیمی کنکور فعال شد.</b>\n───────────────\nربات ۲۴ ساعته روی سرور Netlify اجرا می‌شود — سیستم شما خاموش باشد هم فعال است."});
+          text: "👋 <b>پنل مدیریت ابری شیمی کنکور فعال شد.</b>\n───────────────\nربات ۲۴ ساعته روی سرور Cloudflare اجرا می‌شود — سیستم شما خاموش باشد هم فعال است."});
       } else if (text === "📊 آمار و وضعیت کانال" || text === "/stats") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", reply_markup: MAIN_KEYBOARD,
-          text: "📊 <b>گزارش زنده وضعیت کانال (ابری)</b>\n───────────────\n📢 <b>کانال:</b> @shimi_mohamaddost\n📌 <b>پست پین‌شده:</b> پیام ۵ (هاب ناوبری)\n🚀 <b>مینی‌اپ:</b> فعال با ۱۵ تست و پلنر تعاملی\n⚙️ <b>ربات ابری:</b> ۲۴/۷ فعال روی Netlify ✅\n🔔 <b>وب‌هوک تلگرام:</b> متصل"});
+          text: "📊 <b>گزارش زنده وضعیت کانال (ابری)</b>\n───────────────\n📢 <b>کانال:</b> @shimi_mohamaddost\n📌 <b>پست پین‌شده:</b> پیام ۵ (هاب ناوبری)\n🚀 <b>مینی‌اپ:</b> فعال با ۱۵ تست و پلنر تعاملی\n⚙️ <b>ربات ابری:</b> ۲۴/۷ فعال روی Cloudflare ✅\n🔔 <b>وب‌هوک تلگرام:</b> متصل"});
       } else if (text === "📄 دریافت فایل‌ها" || text === "/files") {
         const kb = {inline_keyboard: [
           [{text: "📄 برگه طلایی واکنش‌ها (PDF)", callback_data: "file_golden_reactions"}],
@@ -495,12 +527,12 @@ export async function handler(event) {
           text: "📅 <b>مدیریت پلنر مطالعاتی و مینی‌اپ</b>\n───────────────\n▫️ <b>بازه فعال:</b> هفته ۲۸ شهریور تا ۳ مهر\n▫️ <b>نسخه تعاملی وب:</b> <code>https://mrrooobooot.github.io/shimi-app/planner.html</code>\n▫️ <b>آزمون مینی‌اپ:</b> ۱۵ تست تفکیک‌شده در ۳ پایه"});
       } else if (text === "⚙️ راهنما و ابزارها" || text === "/help") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", reply_markup: MAIN_KEYBOARD,
-          text: "⚙️ <b>راهنمای پنل ابری ربات دستیار شیمی کنکور</b>\n───────────────\n▫️ <b>آمار:</b> وضعیت لحظه‌ای کانال\n▫️ <b>انتشار:</b> بررسی و ارسال پست‌های آماده به کانال\n▫️ <b>فایل‌ها:</b> دریافت مستقیم PDF و پوسترها\n▫️ <b>پلنر:</b> دسترسی سریع به ابزارهای هوشمند\n\n🆔 @nemathermesbot\n☁️ <b>اجرای ابری ۲۴/۷ روی Netlify</b>"});
+          text: "⚙️ <b>راهنمای پنل ابری ربات دستیار شیمی کنکور</b>\n───────────────\n▫️ <b>آمار:</b> وضعیت لحظه‌ای کانال\n▫️ <b>انتشار:</b> بررسی و ارسال پست‌های آماده به کانال\n▫️ <b>فایل‌ها:</b> دریافت مستقیم PDF و پوسترها\n▫️ <b>پلنر:</b> دسترسی سریع به ابزارهای هوشمند\n\n🆔 @nemathermesbot\n☁️ <b>اجرای ابری ۲۴/۷ روی Cloudflare</b>"});
       } else if (text.startsWith("/setwebhook")) {
-        const url = `https://shimi-chemistry-quiz.netlify.app/.netlify/functions/telegram`;
-        const r = await tg("setWebhook", {url: url, allowed_updates: ["message", "callback_query", "my_chat_member"]});
+        const selfUrl = url.origin + "/";
+        const r = await tg("setWebhook", {url: selfUrl, allowed_updates: ["message", "callback_query", "my_chat_member"], secret_token: env.WEBHOOK_SECRET || undefined});
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
-          text: `🔔 <b>وب‌هوک تلگرام تنظیم شد:</b>\n<code>${url}</code>\n▫️ نتیجه: <code>${JSON.stringify(r)}</code>`});
+          text: `🔔 <b>وب‌هوک تلگرام تنظیم شد:</b>\n<code>${selfUrl}</code>\n▫️ نتیجه: <code>${JSON.stringify(r)}</code>`});
       }
     }
 
@@ -511,13 +543,14 @@ export async function handler(event) {
       const newStatus = mcm.new_chat_member?.status;
       if (newStatus === "member" || newStatus === "administrator") {
         await tg("sendMessage", {chat_id: chat.id, parse_mode: "HTML", reply_markup: MAIN_KEYBOARD,
-          text: "👋 <b>ربات دستیار ابری شیمی کنکور در این گروه فعال شد!</b>\n───────────────\nادمین گرامی، کیبورد مدیریت در پایین صفحه در دسترس شماست.\n☁️ این ربات روی سرور Netlify اجرا می‌شود و ۲۴ ساعته فعال است."});
+          text: "👋 <b>ربات دستیار ابری شیمی کنکور در این گروه فعال شد!</b>\n───────────────\nادمین گرامی، کیبورد مدیریت در پایین صفحه در دسترس شماست.\n☁️ این ربات روی سرور Cloudflare اجرا می‌شود و ۲۴ ساعته فعال است."});
       }
     }
 
-    return {statusCode: 200, body: "ok"};
+    return res("ok", 200);
   } catch (err) {
     console.error("Webhook error:", err);
-    return {statusCode: 200, body: "error"};
+    return res("error", 200);
   }
-}
+  },
+};
