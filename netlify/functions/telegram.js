@@ -9,58 +9,58 @@ const LRM = "\u200E";
 
 const ASSETS = {
   golden_reactions: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/golden_reactions_10_11_12.pdf",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/golden_reactions_10_11_12.pdf",
     type: "document", name: "golden_reactions_10_11_12.pdf",
     caption: "📄 برگه طلایی جمع‌بندی تمام واکنش‌های کتاب درسی (۱۰، ۱۱ و ۱۲)"
   },
   golden_acids: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/golden_sheet_acids_bases.pdf",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/golden_sheet_acids_bases.pdf",
     type: "document", name: "golden_sheet_acids_bases.pdf",
     caption: "📄 برگه طلایی اسیدها، بازها و روابط محاسباتی pH (شیمی دوازدهم)"
   },
   golden_periodic: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/golden_sheet_periodic_grade10.pdf",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/golden_sheet_periodic_grade10.pdf",
     type: "document", name: "golden_sheet_periodic_grade10.pdf",
     caption: "📄 برگه طلایی جدول تناوبی و پیکربندی الکترونی (شیمی دهم)"
   },
   planner_weekly: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/planner_weekly_chemistry.pdf",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/planner_weekly_chemistry.pdf",
     type: "document", name: "planner_weekly_chemistry.pdf",
     caption: "📅 پلنر مطالعاتی هفتگی شیمی کنکور (۲۸ شهریور تا ۳ مهر)"
   },
   planner_exam: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/planner_exam_24h.pdf",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/planner_exam_24h.pdf",
     type: "document", name: "planner_exam_24h.pdf",
     caption: "📅 پلنر ویژه شب امتحان — چرخه ۲۴ ساعته مطالعه و مرور"
   },
   planner_monthly: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/planner_monthly_cycle.pdf",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/planner_monthly_cycle.pdf",
     type: "document", name: "planner_monthly_cycle.pdf",
     caption: "📅 پلنر ماهانه ۴ هفته‌ای — مرور جامع شیمی ۱۰، ۱۱ و ۱۲"
   },
   poster_isotopes: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/poster_isotopes_grade10.png",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/poster_isotopes_grade10.png",
     type: "photo",
     caption: "🖼 پوستر آموزشی شیمی دهم — متد ترازوی گشتاور ایزوتوپ‌ها"
   },
   poster_molar: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/poster_molar_concentration.png",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/poster_molar_concentration.png",
     type: "photo",
     caption: "🖼 پوستر آموزشی مقایسه سه واحد غلظتی (مولار، مولال، ppm)"
   },
   poster_daniel: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/poster_daniel_cell.png",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/poster_daniel_cell.png",
     type: "photo",
     caption: "🖼 پوستر آموزشی پیل دانیل — آناتومی آند و کاتد"
   },
   shimidle: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/shimidle_preview.png",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/shimidle_preview.png",
     type: "photo",
     caption: "🧩 شیمیدل — بازی حدس عنصر روزانه",
     webapp: true
   },
   banner_promo: {
-    url: "https://shimi-chemistry-quiz.netlify.app/assets/banner_miniapp_promo.png",
+    url: "https://mrrooobooot.github.io/shimi-app/assets/banner_miniapp_promo.png",
     type: "photo",
     caption: "⚡️ بنر معرفی مینی‌اپ هوشمند شیمی (آزمون + پلنر تعاملی)"
   },
