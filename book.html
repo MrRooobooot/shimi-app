@@ -33,10 +33,7 @@
   h1{font-size:19px; line-height:1.6; margin-bottom:6px}
   h2{font-size:15px; margin-bottom:10px; color:var(--accent)}
   .sub{color:var(--hint); font-size:13px}
-  .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
-  .facts span{font-size:12.5px; font-weight:700; padding:5px 10px; border-radius:999px;
               background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.25); color:#BAE6FD}
-  .facts span.gold{background:rgba(217,119,6,.14); border-color:rgba(217,119,6,.3); color:#FCD34D}
   ul{margin:0 10px 0 0; padding:0}
   li{font-size:14px; margin-bottom:7px; list-style:none; position:relative; padding-right:16px; color:#E2E8F0}
   li:before{content:""; position:absolute; right:2px; top:11px; width:6px; height:6px; border-radius:50%;
@@ -75,36 +72,26 @@
 
 <div class="card">
   <h1>الهه محمددوست</h1>
-  <p class="sub">دبیر شیمی مؤسسه عارف — مشهد</p>
-  <div class="facts">
-    <span>دانشجوی پزشکی مشهد</span>
-    <span class="gold">رتبه ۷۸۸ کنکور تجربی</span>
-    <span>دبیر شیمی مؤسسه عارف</span>
-  </div>
+  <p class="sub">دانشجوی پزشکی مشهد، دبیر شیمی مؤسسه عارف.</p>
 </div>
 
 <div class="card">
-  <h2>چرا با من؟</h2>
-  <ul>
-    <li>رتبه ۷۸۸ کنکور تجربی و دانشجوی پزشکی مشهد — مسیری که خودم رفته‌ام.</li>
-    <li>دبیر شیمی مؤسسه عارف.</li>
-    <li>برگزاری کارگاه تخصصی محاسبات سریع (کسر تبدیل‌ها) برای بچه‌های کنکور در کانال شیمی.</li>
-    <li>پلنر و سیستم مطالعاتی هفتگی، بر پایه تجربه سال کنکور خودم.</li>
-    <li>آزمون و ابزارهای تمرینی رایگان در مینی‌اپ کانال — شیمی دهم، یازدهم و دوازدهم.</li>
-  </ul>
+  <h2>چند خط درباره من</h2>
+  <p>سال کنکور تجربی رتبه ۷۸۸ شدم و حالا پزشکی مشهد می‌خوانم. شیمی را همان‌طور درس می‌دهم که خودم یاد گرفتم: اول بفهم، بعد سریع بزن. کارگاه محاسبات سریع (کسر تبدیل‌ها) را برای بچه‌های همین کانال برگزار کردم و پلنر هفتگی را هم بر پایه همان روشی نوشتم که خودم با آن جلو می‌رفتم.</p>
+  <p>اگر تازه شروع کرده‌ای، از همین‌جا شروع کن: آزمون، پلنر و بازی جدول تناوبی در مینی‌اپ کانال هست. اگر خواستی جدی‌تر کار کنیم، یک وقت خصوصی بردار.</p>
   <div class="note">کانال شیمی: <a href="https://t.me/shimi_mohamaddost" style="color:var(--accent);text-decoration:none">@shimi_mohamaddost</a></div>
 </div>
 
 <div class="card">
   <h2>ثبت‌نام کلاس</h2>
-  <p class="sub">برای هماهنگی کلاس و شرایط، مستقیم در تلگرام پیام بده.</p>
+  <p class="sub">شرایط کلاس و ساعت‌ها را در تلگرام توضیح می‌دهم. پیام بده تا ببینیم کدام گروه به تو می‌خورد.</p>
   <div style="height:12px"></div>
-  <a class="btn btn-main" href="https://t.me/Elahe_md1383">ثبت‌نام و هماهنگی کلاس</a>
+  <a class="btn btn-main" href="https://t.me/Elahe_md1383">پیام در تلگرام</a>
 </div>
 
 <div class="card">
-  <h2>رزرو وقت شخصی (خصوصی)</h2>
-  <p class="sub">جلسه‌ها <b>۲ ساعته</b> و خصوصی (یک نفر) برگزار می‌شود. زمان جلسه اول را تو پیشنهاد می‌دهی، من بررسی و نهایی می‌کنم و همین صفحه زمان تأییدشده را نشان می‌دهد.</p>
+  <h2>وقت شخصی</h2>
+  <p class="sub">جلسه خصوصی است، یک نفر، <b>۲ ساعت</b>. برای جلسه اول روز و ساعتی که راحت‌تری را بنویس. اگر آن ساعت پر باشد نزدیک‌ترین گزینه را پیشنهاد می‌دهم؛ زمان نهایی را همین صفحه نشان می‌دهد.</p>
 
   <form id="bookForm">
     <label for="name">نام و نام خانوادگی</label>
@@ -123,19 +110,19 @@
     <input id="contact" name="contact" required minlength="3" maxlength="40" placeholder="مثال: @username یا ۰۹۱۲۳۴۵۶۷۸۹" dir="ltr">
 
     <label for="topic">موضوع درخواستی</label>
-    <textarea id="topic" name="topic" required minlength="3" maxlength="200" placeholder="مثال: استوکیومتری و محلول‌ها — مشکل در تبدیل‌ها"></textarea>
+    <textarea id="topic" name="topic" required minlength="3" maxlength="200" placeholder="مثال: استوکیومتری و محلول‌ها، مشکل در تبدیل‌ها"></textarea>
 
     <label for="prefer">روز و ساعت پیشنهادی برای جلسه اول</label>
     <input id="prefer" name="prefer" required minlength="3" maxlength="100" placeholder="مثال: پنجشنبه ۱۸ تا ۲۰">
 
     <div style="height:14px"></div>
-    <button class="btn btn-main" type="submit" id="submitBtn">ثبت درخواست وقت</button>
+    <button class="btn btn-main" type="submit" id="submitBtn">ارسال درخواست وقت</button>
     <div class="msg" id="formMsg"></div>
   </form>
 
   <div id="refBox" style="display:none; margin-top:14px">
     <div class="status-row"><b>کد پیگیری</b><span><code id="refCode"></code></span></div>
-    <div class="note">این کد را نگه دار. لینک وضعیت:
+    <div class="note">کد را نگه دار. وضعیت را از این لینک ببین:
       <a id="refLink" href="#" style="color:var(--accent);text-decoration:none">صفحه وضعیت وقت من</a>
     </div>
   </div>
@@ -179,7 +166,7 @@ if (ref) {
         row("زمان نهایی جلسه", d.time || "هنوز تعیین نشده")
       );
     })
-    .catch(() => { box.textContent = "ارتباط برقرار نشد. بعداً دوباره امتحان کن."; });
+    .catch(() => { box.textContent = "ارتباط برقرار نشد. یک بار دیگر امتحان کن."; });
 }
 
 const form = document.getElementById("bookForm");
@@ -199,7 +186,7 @@ form.addEventListener("submit", async (e) => {
     const d = await r.json();
     if (!d.ok) throw new Error(d.error || "failed");
     msg.className = "msg ok";
-    msg.textContent = "درخواستت ثبت شد. زمان پیشنهادی‌ات بررسی می‌شود و نتیجه در همین صفحه (لینک وضعیت) دیده می‌شود.";
+    msg.textContent = "درخواستت ثبت شد. زمان را می‌بینم و نتیجه را در صفحه وضعیت می‌نویسم.";
     form.reset();
     document.getElementById("refCode").textContent = d.id;
     const link = document.getElementById("refLink");
@@ -207,9 +194,9 @@ form.addEventListener("submit", async (e) => {
     document.getElementById("refBox").style.display = "block";
   } catch (err) {
     msg.className = "msg err";
-    msg.textContent = "ارسال نشد. همه فیلدها را کامل کن و دوباره امتحان کن.";
+    msg.textContent = "ارسال نشد. فیلدها را کامل کن و یک بار دیگر بزن.";
   } finally {
-    btn.disabled = false; btn.textContent = "ثبت درخواست وقت";
+    btn.disabled = false; btn.textContent = "ارسال درخواست وقت";
   }
 });
 </script>
