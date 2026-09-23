@@ -595,6 +595,8 @@ const ALL_QUESTIONS = [
 const TIME_PER_Q = 60;   // ثانیه
 const FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
 const fa = n => String(n).replace(/\d/g, d => FA[+d]);
+const cut = (s, n) => s.length > n ? s.slice(0, n).replace(/\s+\S*$/, "") + "…" : s;
+
 
 /* ---------- Telegram SDK (اختیاری — لوکال هم کار می‌کند) ---------- */
 const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
@@ -715,8 +717,6 @@ function renderResult(){
   const p11 = g11.length ? Math.round((g11.filter(a => a.ok).length / g11.length) * 100) : null;
   const p12 = g12.length ? Math.round((g12.filter(a => a.ok).length / g12.length) * 100) : null;
 
-  const used = answers.reduce((s,a) => s + (TIME_PER_Q - Math.max(left,0)), 0);
-
   app.innerHTML = `
     <div class="result">
       <div class="ring">
@@ -748,7 +748,7 @@ function renderResult(){
         ${answers.map((a,n) => `
           <div class="rev ${a.ok ? "y" : "n"}">
             <i>${a.ok ? "✓" : "✕"}</i>
-            <span>سؤال ${fa(n+1)} — ${QUESTIONS[a.i].q.slice(0,42)}…</span>
+            <span>سؤال ${fa(n+1)} — ${cut(QUESTIONS[a.i].q, 42)}</span>
           </div>`).join("")}
       </div>
 
