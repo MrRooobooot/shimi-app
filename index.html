@@ -401,7 +401,7 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const colors = ['#38BDF8', '#F1C40F', '#22C55E', '#EC4899', '#A855F7', '#F97316'];
+  const colors = ['#38BDF8', '#D97706', '#0284C7', '#059669', '#FBBF24', '#0EA5E9'];
   const particles = Array.from({ length: 45 }, () => ({
     x: x,
     y: y,
@@ -707,9 +707,9 @@ function renderResult(){
   const wrong = answers.length - right;
   
   // Grade-wise percentages
-  const g10 = answers.filter(a => QUESTIONS[a.i].grade === 10);
-  const g11 = answers.filter(a => QUESTIONS[a.i].grade === 11);
-  const g12 = answers.filter(a => QUESTIONS[a.i].grade === 12);
+  const g10 = answers.filter(a => QUESTIONS[a.i].g === "10");
+  const g11 = answers.filter(a => QUESTIONS[a.i].g === "11");
+  const g12 = answers.filter(a => QUESTIONS[a.i].g === "12");
   const p10 = g10.length ? Math.round((g10.filter(a => a.ok).length / g10.length) * 100) : null;
   const p11 = g11.length ? Math.round((g11.filter(a => a.ok).length / g11.length) * 100) : null;
   const p12 = g12.length ? Math.round((g12.filter(a => a.ok).length / g12.length) * 100) : null;

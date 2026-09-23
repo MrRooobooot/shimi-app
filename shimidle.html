@@ -363,7 +363,7 @@ function fireConfetti(x = window.innerWidth / 2, y = window.innerHeight / 3) {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const colors = ['#38BDF8', '#F1C40F', '#22C55E', '#EC4899', '#A855F7', '#F97316'];
+  const colors = ['#38BDF8', '#D97706', '#0284C7', '#059669', '#FBBF24', '#0EA5E9'];
   const particles = Array.from({ length: 45 }, () => ({
     x: x,
     y: y,
@@ -431,26 +431,28 @@ const dayNumber = Math.floor((today.getTime() - today.getTimezoneOffset() * 6000
 const secretIndex = dayNumber % ELEMENTS.length;
 const SECRET = ELEMENTS[secretIndex];
 
-const KEY = "shimidle_pro_v2_" + secretIndex;
+const PUZZLE_NO = (dayNumber % 100) + 1;
+const KEY = "shimidle_pro_v2_" + dayNumber;
 let state = {
   guesses: [],
   solved: false,
   failed: false,
   hintUsed: false,
-  streak: 1
+  streak: 0,
+  streakDay: null
 };
 
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) state = { ...state, ...JSON.parse(raw) };
-    const st = localStorage.getItem("shimidle_streak");
-    if (st) state.streak = parseInt(st) || 1;
+    const st = JSON.parse(localStorage.getItem("shimidle_streak") || "{}");
+    if (st && typeof st.n === "number") { state.streak = st.n; state.streakDay = st.d; }
   } catch (e) {}
 }
 function save() {
   localStorage.setItem(KEY, JSON.stringify(state));
-  localStorage.setItem("shimidle_streak", state.streak);
+  localStorage.setItem("shimidle_streak", JSON.stringify({ d: state.streakDay, n: state.streak }));
 }
 
 /* Compare guess with secret element */
@@ -492,7 +494,7 @@ function renderGuesses() {
       </div>
       <div class="tile ${ev.type.status}">
         <span style="font-size:10.5px">${ev.type.text}</span>
-        <span class="sub">گروه</span>
+        <span class="sub">نوع عنصر</span>
       </div>
     </div>
   `).join("");
@@ -529,10 +531,17 @@ function renderChips(filter = "") {
   );
 }
 
+function note(msg) {
+  const b = document.getElementById("hintBox");
+  b.style.display = "block";
+  b.textContent = msg;
+}
+
 function submitGuess(el) {
   if (state.solved || state.failed) return;
   if (state.guesses.some(g => g.element.z === el.z)) {
     haptic("rigid");
+    note("این عنصر را قبلاً حدس زده‌ای.");
     return;
   }
 
@@ -541,7 +550,10 @@ function submitGuess(el) {
 
   if (el.z === SECRET.z) {
     state.solved = true;
-    state.streak++;
+    if (state.streakDay !== dayNumber) {
+      state.streak = (state.streakDay === dayNumber - 1) ? state.streak + 1 : 1;
+      state.streakDay = dayNumber;
+    }
     fireConfetti();
     setTimeout(() => fireConfetti(window.innerWidth * 0.7, window.innerHeight * 0.3), 300);
     haptic("medium");
@@ -575,7 +587,7 @@ function checkGameOver() {
         <div class="res-fun">💡 <b>نکته طلایی کنکور:</b> ${SECRET.fun}</div>
         <div class="res-stats">
           <div class="stat-pill"><b>${fa(state.guesses.length)} / ۶</b><span>تعداد حدس</span></div>
-          <div class="stat-pill"><b>🔥 ${fa(state.streak)}</b><span>استریک روزانه</span></div>
+          <div class="stat-pill"><b>🔥 ${fa(state.streak)}</b><span>روزهای پیوسته</span></div>
           <div class="stat-pill"><b>دوره ${fa(SECRET.period)} • گروه ${fa(SECRET.group)}</b><span>موقعیت جدول</span></div>
         </div>
         <button class="share-btn" id="shareResultBtn">
@@ -594,7 +606,7 @@ function checkGameOver() {
         return `${zSym}${pSym}${grSym}${bSym}`;
       }).join("\n");
 
-      const shareMsg = `🧩 شیمیدل پرو | معما #${fa(dayNumber % 365)}\n` +
+      const shareMsg = `🧩 شیمیدل پرو | معما #${fa(PUZZLE_NO)}\n` +
         `نتیجه: ${won ? fa(state.guesses.length) + "/۶" : "✕"}\n` +
         gridText + `\n\n` +
         `تو هم عنصر امروز رو حدس بزن 👇\n` +
@@ -611,7 +623,7 @@ function checkGameOver() {
 
 /* Init */
 load();
-document.getElementById("dayPill").textContent = `پازل #${fa((dayNumber % 100) + 1)} — ${today.toLocaleDateString("fa-IR", { weekday: "long", day: "numeric", month: "long" })}`;
+document.getElementById("dayPill").textContent = `پازل #${fa(PUZZLE_NO)} — ${today.toLocaleDateString("fa-IR", { weekday: "long", day: "numeric", month: "long" })}`;
 renderGuesses();
 renderChips();
 checkGameOver();
@@ -630,7 +642,7 @@ document.getElementById("guessBtn").onclick = () => {
   const val = inp.value.trim().toLowerCase();
   const found = ELEMENTS.find(x => x.name.toLowerCase() === val || x.sym.toLowerCase() === val || String(x.z) === val);
   if (found) submitGuess(found);
-  else haptic("rigid");
+  else { haptic("rigid"); note("عنصر پیدا نشد. از فهرست انتخاب کن یا نام دقیق‌تر بنویس."); }
 };
 
 document.getElementById("hintBtn").onclick = () => {
