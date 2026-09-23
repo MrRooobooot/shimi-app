@@ -546,26 +546,28 @@ const JM = ["", "فروردین", "اردیبهشت", "خرداد", "تیر", "�
 const PARTS = ["صبح زود", "قبل از ظهر", "بعد از ظهر", "غروب", "شب", "مرور شب"];
 const KEY = "shimi_planner_v1";
 
-const today = new Date();
-let weekStart = new Date(today);
-if (today.getFullYear() === 2026 && today.getMonth() === 8 && today.getDate() >= 19 && today.getDate() <= 25) {
-  weekStart = new Date(2026, 8, 19);
-} else {
-  const satOff = (today.getDay() - 6 + 7) % 7;
-  weekStart.setDate(today.getDate() - satOff);
+const pad = n => String(n).padStart(2, "0");
+const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+function buildWeek() {
+  const today = new Date();
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - ((today.getDay() + 1) % 7)); // هفته از شنبه
+  const wk = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
+    const [jy, jm, jd] = g2j(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    const idx = (d.getDay() + 1) % 7; // شنبه = ۰
+    wk.push({
+      key: dayKey(d), name: DAYN[idx], short: DAYS[idx],
+      date: fa(jd) + " " + JM[jm], dateShort: fa(jd),
+      isToday: dayKey(d) === dayKey(today)
+    });
+  }
+  return wk;
 }
 
-const WEEK = [];
-for (let i = 0; i < 7; i++) {
-  const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
-  const [jy, jm, jd] = g2j(d.getFullYear(), d.getMonth() + 1, d.getDate());
-  const idx = (d.getDay() + 6) % 7;
-  WEEK.push({
-    key: d.toISOString().slice(0, 10), name: DAYN[idx], short: DAYS[idx],
-    date: fa(jd) + " " + JM[jm], dateShort: fa(jd),
-    isToday: d.toDateString() === today.toDateString()
-  });
-}
+const WEEK = buildWeek();
 
 let state = { target: 30, days: {} };
 WEEK.forEach(d => state.days[d.key] = PARTS.map(() => ({ sub: "", hrs: "", done: false })));
@@ -722,6 +724,13 @@ document.getElementById("copyYesterdayBtn").addEventListener("click", () => {
   } else {
     haptic("rigid");
   }
+});
+
+// صفحه ممکن است شب باز بماند: با عوض شدن روز، هفته و تاریخ‌ها خودکار به‌روز می‌شوند
+let dayStamp = dayKey(new Date());
+setInterval(() => { if (dayKey(new Date()) !== dayStamp) location.reload(); }, 60000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && dayKey(new Date()) !== dayStamp) location.reload();
 });
 
 </script>
