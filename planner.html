@@ -387,7 +387,7 @@
     </div>
 
     <div class="chart-card">
-      <h3><span>نمودار بازدهی</span><span>ساعت مطالعه روزانه</span></h3>
+      <h3><span>ساعت مطالعه هر روز</span><span>روزهای هفته</span></h3>
       <div class="bars" id="bars"></div>
     </div>
   </div>
@@ -397,20 +397,20 @@
     <div class="days" id="days"></div>
     <div class="panel">
       <div class="panel-hd">
-        <h2 id="dayTitle">پارت‌های مطالعه امروز</h2>
+        <h2 id="dayTitle">بخش‌های مطالعه امروز</h2>
         <div style="display:flex;align-items:center;gap:8px">
-          <button class="copy-btn" id="copyYesterdayBtn" title="کپی پارت‌های روز قبل به امروز">📋 کپی از دیروز</button>
+          <button class="copy-btn" id="copyYesterdayBtn" title="کپی بخش‌های روز قبل">کپی از دیروز</button>
           <div class="sum">مجموع امروز: <b id="dayTotal">۰</b> ساعت</div>
         </div>
       </div>
       <div class="quick-tags" id="quickTags">
-        <span class="qtag" data-tag="شیمی ۱۰: ایزوتوپ و آرایش">🧪 ۱۰: آرایش و اتم</span>
-        <span class="qtag" data-tag="شیمی ۱۱: هیدروکربن و جدول">⚡️ ۱۱: جدول و آلکان</span>
-        <span class="qtag" data-tag="شیمی ۱۲: اسید، باز و pH">🔬 ۱۲: اسید و باز</span>
-        <span class="qtag" data-tag="شیمی ۱۲: صابون و پاک‌کننده">🧼 ۱۲: پاک‌کننده‌ها</span>
-        <span class="qtag" data-tag="مسائل خلوص و بازده">⚖️ خلوص و استوکیومتری</span>
-        <span class="qtag" data-tag="حل تست آموزشی و زمان‌دار">⏱ تست زمان‌دار</span>
-        <span class="qtag" data-tag="مرور ایستگاه آزمون مهر">🎯 مرور آزمون مهر</span>
+        <span class="qtag" data-tag="شیمی ۱۰: ایزوتوپ و آرایش">دهم: آرایش و اتم</span>
+        <span class="qtag" data-tag="شیمی ۱۱: هیدروکربن و جدول">یازدهم: جدول و آلکان</span>
+        <span class="qtag" data-tag="شیمی ۱۲: اسید، باز و pH">دوازدهم: اسید و باز</span>
+        <span class="qtag" data-tag="شیمی ۱۲: صابون و پاک‌کننده">دوازدهم: پاک‌کننده‌ها</span>
+        <span class="qtag" data-tag="مسائل خلوص و بازده">خلوص و استوکیومتری</span>
+        <span class="qtag" data-tag="حل تست آموزشی و زمان‌دار">تست زمان‌دار</span>
+        <span class="qtag" data-tag="مرور ایستگاه آزمون مهر">مرور آزمون مهر</span>
       </div>
       <div class="parts-grid" id="parts"></div>
     </div>
@@ -630,7 +630,7 @@ function bindNum(inp, onVal) {
 function renderParts() {
   const list = state.days[active];
   const activeDayObj = WEEK.find(d => d.key === active);
-  document.getElementById("dayTitle").textContent = `پارت‌های ${activeDayObj ? activeDayObj.name : "امروز"}`;
+  document.getElementById("dayTitle").textContent = `بخش‌های ${activeDayObj ? activeDayObj.name : "امروز"}`;
   document.getElementById("dayTotal").textContent = fa(Math.round(dayHours(active) * 10) / 10);
 
   document.getElementById("parts").innerHTML = list.map((p, i) => `
@@ -639,7 +639,7 @@ function renderParts() {
         <button class="chk" data-act="toggle" data-i="${i}" title="${p.done ? "انجام شده" : "ثبت به عنوان انجام شده"}">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
-        <span class="nm">پارت ${fa(i + 1)} · ${PARTS[i]}</span>
+        <span class="nm">بخش ${fa(i + 1)} · ${PARTS[i]}</span>
         <div class="hrs-wrap">
           <input class="hrs" data-act="hrs" data-i="${i}" placeholder="۰" inputmode="decimal" value="${p.hrs ? fa(p.hrs) : ""}">
           <span class="hrs-lbl">ساعت</span>

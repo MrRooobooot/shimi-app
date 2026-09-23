@@ -340,7 +340,7 @@
     <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6"/><path d="M10 2v6L4.9 17.4A2 2 0 0 0 6.7 21h10.6a2 2 0 0 0 1.8-3.6L14 8V2"/><path d="M7.3 14.5h9.4"/></svg></div>
     <div>
       <h1>آزمون تعاملی شیمی</h1>
-      <p>الهه محمددوست • رتبه ۷۸۸</p>
+      <p>الهه محمددوست • رتبه ۷۸۸ کنکور تجربی</p>
     </div>
   </div>
   <div class="timer" id="timer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><b id="tv">۶۰</b></div>
@@ -353,6 +353,7 @@
   <button class="gb" data-g="12">دوازدهم (۵)</button>
 </div>
 <div class="bar"><i id="bar"></i></div>
+<p style="margin:10px 2px 0;font-size:12.5px;line-height:1.9;color:var(--hint)">هر سؤال یک دقیقه وقت دارد. بعد از هر پاسخ روش حل را می‌بینی و آخر کار درصد و کارنامه پایه‌ای‌ات را.</p>
 
 <main id="app"></main>
 
@@ -456,7 +457,7 @@ const ALL_QUESTIONS = [
     eq: "³⁵X (75%) , ³⁷X (25%)",
     opts: ["۳۵.۲۵", "۳۵.۵۰", "۳۶.۰۰", "۳۶.۵۰"],
     ans: 1,
-    why: "با متد ترازوی گشتاور: جرم سبک‌تر (۳۵) را تکیه‌گاه بذار و انحراف سنگین‌تر را اضافه کن.",
+    why: "با متد ترازوی گشتاور: جرم سبک‌تر (۳۵) را تکیه‌گاه بگذار و انحراف سنگین‌تر را اضافه کن.",
     steps: ["تکیه‌گاه:  35", "انحراف:    (37 − 35) × 0.25 = 0.50", "میانگین:   35 + 0.50 = 35.50 amu"]
   },
   {
@@ -698,10 +699,10 @@ function renderResult(){
   const C = 2 * Math.PI * 66;
   const off = C - (pct / 100) * C;
   const color = pct >= 80 ? "var(--ok)" : pct >= 50 ? "var(--gold)" : "var(--bad)";
-  const msg = pct === 100 ? "بی‌نقص! 🏆"
-            : pct >= 80 ? "عالی بود! 🔥"
-            : pct >= 50 ? "خوب، ولی جای پیشرفت داری 💪"
-            : "نیاز به مرور داری 📚";
+  const msg = pct === 100 ? "همه درست. این مبحث را کامل بلدی"
+            : pct >= 80 ? "قوی بودی؛ چند نکته مانده که با مرور می‌آید"
+            : pct >= 50 ? "پایه‌ات خوب است، جاهای مشخصی لنگ می‌زند"
+            : "این مباحث را باید از اول مرور کنی";
 
   const right = answers.filter(a => a.ok).length;
   const wrong = answers.length - right;
@@ -751,8 +752,8 @@ function renderResult(){
           </div>`).join("")}
       </div>
 
-      <button class="cta" id="again">🔄 آزمون مجدد</button>
-      <button class="cta ghost" id="share" style="margin-top:9px">📬 ثبت‌نام کلاس</button>
+      <button class="cta" id="again">آزمون مجدد</button>
+      <button class="cta ghost" id="share" style="margin-top:9px">ثبت‌نام کلاس و مشاوره</button>
     </div>`;
 
   el("again").onclick = () => { i = 0; score = 0; answers = []; renderQuestion(); };
