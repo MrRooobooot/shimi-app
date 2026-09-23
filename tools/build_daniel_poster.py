@@ -51,7 +51,7 @@ def build_html() -> str:
     font-size: 21px; font-weight: 800; margin-bottom: 14px;
   }}
   .hero h1 {{ font-size: 64px; font-weight: 900; color: #FFFFFF; line-height: 1.22; text-shadow: 0 8px 24px rgba(0,0,0,.7); }}
-  .hero h1 span {{ color: #F1C40F; }}
+  .hero h1 span {{ color: #D97706; }}
   .hero p.sub {{ margin-top: 12px; font-size: 24px; font-weight: 700; color: #B9C6E4; }}
 
   /* Cell diagram */

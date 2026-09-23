@@ -51,7 +51,7 @@ def build_html() -> str:
     font-size: 21px; font-weight: 800; margin-bottom: 16px;
   }}
   .hero h1 {{ font-size: 66px; font-weight: 900; color: #FFFFFF; line-height: 1.22; text-shadow: 0 8px 24px rgba(0,0,0,.7); }}
-  .hero h1 span {{ color: #00E5FF; }}
+  .hero h1 span {{ color: #0284C7; }}
   .hero p.sub {{ margin-top: 14px; font-size: 24px; font-weight: 700; color: #B9C6E4; }}
 
   .stage {{ display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 34px; position: relative; z-index: 10; flex: 1 1 auto; }}
@@ -90,7 +90,7 @@ def build_html() -> str:
   .ex-calc {{
     direction: ltr; unicode-bidi: isolate;
     background: rgba(0,0,0,.4); border-radius: 10px; padding: 9px 16px;
-    font-size: 22px; font-weight: 900; color: #00E5FF; margin-top: 9px; text-align: center;
+    font-size: 22px; font-weight: 900; color: #0284C7; margin-top: 9px; text-align: center;
   }}
 
   .ft {{

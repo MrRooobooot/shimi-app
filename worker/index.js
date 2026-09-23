@@ -380,6 +380,29 @@ export default {
         const r = await tg("getWebhookInfo", {});
         return res(JSON.stringify(r), 200);
       }
+      // one-time: repoint the two channel posts whose buttons still held the dead netlify domain
+      if (url.pathname === "/fixlinks") {
+        const linkFixes = [
+          {id: 35, text: "📱 نسخه هوشمند و تعاملی (پلنر آنلاین) ↗",
+           url: "https://mrrooobooot.github.io/shimi-app/planner.html",
+           second: {text: "📬 هماهنگی و ثبت‌نام کلاس", url: "https://t.me/Elahe_md1383"}},
+          {id: 36, text: "🚀 ورود به مینی‌اپ شیمی (آزمون و پلنر) ↗",
+           url: "https://mrrooobooot.github.io/shimi-app/",
+           second: {text: "📬 هماهنگی و ثبت‌نام کلاس و کارگاه‌ها ↗", url: "https://t.me/Elahe_md1383"}},
+        ];
+        if (url.searchParams.get("go") !== "1") {
+          return res(JSON.stringify({dry_run: true, linkFixes}, null, 2), 200);
+        }
+        const out = [];
+        for (const f of linkFixes) {
+          const r = await tg("editMessageReplyMarkup", {
+            chat_id: CHANNEL_ID, message_id: f.id,
+            reply_markup: {inline_keyboard: [[{text: f.text, url: f.url}], [f.second]]},
+          });
+          out.push({id: f.id, ok: r.ok, result: r.result, error: r.description});
+        }
+        return res(JSON.stringify(out), 200);
+      }
     }
 
     if (request.method === "GET") {

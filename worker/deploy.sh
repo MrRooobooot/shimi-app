@@ -26,11 +26,22 @@ JSONC
 
 redact() { sed -E 's/[0-9]{8,10}:[A-Za-z0-9_-]{30,}/<token-redacted>/g'; }
 
+# wrangler's OAuth refresh is bot-challenged on some networks; an API token in .env.local wins.
+if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+  export CLOUDFLARE_API_TOKEN
+  echo "auth: CLOUDFLARE_API_TOKEN from .env.local"
+else
+  echo "auth: wrangler OAuth (no CLOUDFLARE_API_TOKEN in .env.local)"
+fi
+
 put_secret() {
   printf '%s' "$2" | npx --yes wrangler@latest secret put "$1" -c .wrangler.local.jsonc 2>&1 | redact | tail -2
 }
-put_secret TELEGRAM_BOT_TOKEN "$TOKEN"
-put_secret WEBHOOK_SECRET "$WEBHOOK_SECRET"
-put_secret ADMIN_KEY "$ADMIN_KEY"
+if [ "${1:-}" = "--secrets" ]; then
+  shift
+  put_secret TELEGRAM_BOT_TOKEN "$TOKEN"
+  put_secret WEBHOOK_SECRET "$WEBHOOK_SECRET"
+  put_secret ADMIN_KEY "$ADMIN_KEY"
+fi
 
 npx --yes wrangler@latest deploy -c .wrangler.local.jsonc "$@" 2>&1 | redact
