@@ -16,11 +16,27 @@ fi
 # shellcheck disable=SC1091
 . ./.env.local
 
-cat > .wrangler.local.jsonc <<'JSONC'
+# KV namespace for bookings — created once, id reused afterwards
+NS_ID=$(npx --yes wrangler@latest kv namespace list 2>/dev/null | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    d = []
+print(next((n.get('id', '') for n in d if 'BOOKINGS' in str(n.get('title', ''))), ''))
+")
+if [ -z "$NS_ID" ]; then
+  NS_ID=$(npx --yes wrangler@latest kv namespace create BOOKINGS 2>&1 | grep -oE '[0-9a-f]{32}' | head -1)
+fi
+[ -n "$NS_ID" ] || { echo "could not resolve KV namespace BOOKINGS" >&2; exit 1; }
+echo "kv: BOOKINGS=$NS_ID"
+
+cat > .wrangler.local.jsonc <<JSONC
 {
   "name": "shimi-chem-bot",
   "main": "index.js",
-  "compatibility_date": "2025-01-01"
+  "compatibility_date": "2025-01-01",
+  "kv_namespaces": [{"binding": "BOOKINGS", "id": "$NS_ID"}]
 }
 JSONC
 

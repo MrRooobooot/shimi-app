@@ -355,7 +355,59 @@ const CLOSERS = [
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
 let TOKEN;
-const res = (body, status = 200) => new Response(body, {status});
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Content-Type": "text/plain; charset=utf-8",
+};
+const res = (body, status = 200, headers = {}) =>
+  new Response(body, {status, headers: {...CORS, ...headers}});
+const jsonRes = (obj, status = 200) =>
+  res(JSON.stringify(obj), status, {"Content-Type": "application/json; charset=utf-8"});
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// who gets told about a new booking request: Elahe in PM + the working group
+const BOOK_NOTIFY = [6712714529, GROUP_ID];
+
+async function handleBook(request, env) {
+  let d;
+  try {
+    d = await request.json();
+  } catch (e) {
+    return jsonRes({ok: false, error: "bad_json"}, 400);
+  }
+  const clean = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, n);
+  const name = clean(d.name, 40), grade = clean(d.grade, 20), contact = clean(d.contact, 40);
+  const topic = clean(d.topic, 200), prefer = clean(d.prefer, 100);
+  if (name.length < 3 || !grade || contact.length < 3 || topic.length < 3 || prefer.length < 3) {
+    return jsonRes({ok: false, error: "incomplete"}, 400);
+  }
+  if (!/^[@+\-()\d\sA-Za-z_.آ-ی\u200c]{3,40}$/.test(contact)) {
+    return jsonRes({ok: false, error: "bad_contact"}, 400);
+  }
+
+  const bytes = crypto.getRandomValues(new Uint8Array(5));
+  const id = [...bytes].map(b => b.toString(36).padStart(2, "0")).join("").slice(0, 8);
+  const rec = {id, name, grade, contact, topic, prefer, status: "pending", created_at: new Date().toISOString()};
+  if (env.BOOKINGS) await env.BOOKINGS.put(`booking:${id}`, JSON.stringify(rec));
+
+  const text = `🗓 <b>درخواست وقت شخصی جدید</b>\n───────────────\n▫️ <b>کد پیگیری:</b> <code>${id}</code>\n▫️ <b>نام:</b> ${esc(name)}\n▫️ <b>پایه:</b> ${esc(grade)}\n▫️ <b>تماس:</b> ${esc(contact)}\n▫️ <b>موضوع:</b> ${esc(topic)}\n▫️ <b>زمان پیشنهادی:</b> ${esc(prefer)}\n───────────────\nتأیید زمان: <code>/settime ${id} ۱۴۰۵/۰۷/۰۵ - ۱۸:۰۰</code>`;
+  for (const chat of BOOK_NOTIFY) {
+    await tg("sendMessage", {chat_id: chat, parse_mode: "HTML", text: text});
+  }
+  return jsonRes({ok: true, id});
+}
+
+async function handleMyBooking(env, url) {
+  const id = String(url.searchParams.get("id") || "").trim().slice(0, 12);
+  if (!/^[a-z0-9]{4,12}$/.test(id)) return jsonRes({ok: false, error: "bad_id"}, 400);
+  if (!env.BOOKINGS) return jsonRes({ok: false, error: "no_store"}, 503);
+  const raw = await env.BOOKINGS.get(`booking:${id}`);
+  if (!raw) return jsonRes({ok: false, error: "not_found"}, 404);
+  const r = JSON.parse(raw);
+  return jsonRes({ok: true, id: r.id, name: r.name, topic: r.topic, prefer: r.prefer, time: r.time || null, status: r.status});
+}
 
 export default {
   async fetch(request, env) {
@@ -363,6 +415,11 @@ export default {
 
     const url = new URL(request.url);
     const key = url.searchParams.get("key");
+
+    if (request.method === "OPTIONS") return res("", 204);
+    // public booking endpoints (no Telegram secret: they are called by the web page)
+    if (url.pathname === "/book" && request.method === "POST") return handleBook(request, env);
+    if (url.pathname === "/mybooking" && request.method === "GET") return handleMyBooking(env, url);
 
     // admin routes (guard: key must match the ADMIN_KEY binding)
     if (request.method === "GET" && env.ADMIN_KEY && key === env.ADMIN_KEY) {
@@ -551,6 +608,42 @@ export default {
       } else if (text === "⚙️ راهنما و ابزارها" || text === "/help") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", reply_markup: MAIN_KEYBOARD,
           text: "⚙️ <b>راهنمای پنل ابری ربات دستیار شیمی کنکور</b>\n───────────────\n▫️ <b>آمار:</b> وضعیت لحظه‌ای کانال\n▫️ <b>انتشار:</b> بررسی و ارسال پست‌های آماده به کانال\n▫️ <b>فایل‌ها:</b> دریافت مستقیم PDF و پوسترها\n▫️ <b>پلنر:</b> دسترسی سریع به ابزارهای هوشمند\n\n🆔 @nemathermesbot\n☁️ <b>اجرای ابری ۲۴/۷ روی Cloudflare</b>"});
+      } else if (text.startsWith("/settime")) {
+        const parts = text.split(/\s+/);
+        const ref = parts[1], when = parts.slice(2).join(" ").trim();
+        let body;
+        if (!ref || !when) {
+          body = "🧭 <b>روش ثبت زمان جلسه</b>\n<code>/settime کد زمان</code>\nمثال: <code>/settime " + "ab12cd34 ۱۴۰۵/۰۷/۰۵ - ۱۸:۰۰</code>";
+        } else {
+          const raw = env.BOOKINGS ? await env.BOOKINGS.get(`booking:${ref}`) : null;
+          if (!raw) {
+            body = `❌ درخواستی با کد <code>${esc(ref)}</code> پیدا نشد.`;
+          } else {
+            const r = JSON.parse(raw);
+            r.time = when;
+            r.status = "confirmed";
+            r.confirmed_at = new Date().toISOString();
+            await env.BOOKINGS.put(`booking:${ref}`, JSON.stringify(r));
+            body = `✅ زمان ثبت شد\n▫️ کد: <code>${esc(ref)}</code>\n▫️ دانش‌آموز: ${esc(r.name)}\n▫️ زمان: ${esc(when)}\n───────────────\nصفحه وضعیت دانش‌آموز: <code>https://mrrooobooot.github.io/shimi-app/book.html?ref=${esc(ref)}</code>`;
+          }
+        }
+        await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", text: body});
+      } else if (text === "/bookings" || text === "🗓 وقت‌های شخصی") {
+        if (!env.BOOKINGS) {
+          await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML", text: "⚠️ فضای ذخیره‌سازی BOOKINGS متصل نیست."});
+        } else {
+          const list = await env.BOOKINGS.list({prefix: "booking:", limit: 50});
+          const rows = [];
+          for (const k of list.keys) {
+            const r = JSON.parse(await env.BOOKINGS.get(k.name));
+            if (r.status !== "confirmed") {
+              rows.push(`▫️ <code>${esc(r.id)}</code> — ${esc(r.name)} (${esc(r.grade)}) — ${esc(r.prefer)} — ${esc(r.contact)}`);
+            }
+          }
+          await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
+            text: rows.length ? `🗓 <b>درخواست‌های در انتظار زمان</b>\n───────────────\n${rows.slice(0, 15).join("\n")}\n───────────────\nثبت زمان: <code>/settime کد زمان</code>`
+                             : "✅ هیچ درخواست در انتظاری نیست."});
+        }
       } else if (text.startsWith("/setwebhook")) {
         const selfUrl = url.origin + "/";
         const r = await tg("setWebhook", {url: selfUrl, allowed_updates: ["message", "callback_query", "my_chat_member"], secret_token: env.WEBHOOK_SECRET || undefined});

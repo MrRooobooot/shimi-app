@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>رزرو وقت شخصی و ثبت‌نام کلاس شیمی | الهه محمددوست</title>
+<style>
+  :root{
+    --bg:#080E21; --bg2:#0F172A; --text:#F1F5F9; --hint:#94A3B8;
+    --accent:#38BDF8; --gold:#D97706; --cyan:#0284C7; --ok:#22C55E; --bad:#EF4444;
+    --card:rgba(15,23,42,.72); --border:rgba(255,255,255,.08);
+    --glow:inset 0 1px 0 0 rgba(255,255,255,.12), 0 4px 20px -2px rgba(0,0,0,.4);
+  }
+  .nav{display:flex; gap:5px; background:var(--card); backdrop-filter:blur(16px); border:1px solid var(--border);
+       box-shadow:var(--glow); border-radius:16px; padding:5px; margin-bottom:14px}
+  .nav a{flex:1; display:flex; align-items:center; justify-content:center; padding:10px 4px; border-radius:12px;
+         text-decoration:none; font-size:12.5px; font-weight:800; color:var(--hint)}
+  .nav a.on{background:rgba(56,189,248,.16); color:var(--accent)}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(600px circle at 50% -100px, rgba(56,189,248,.20), transparent 70%),
+      radial-gradient(500px circle at 100% 85%, rgba(217,119,6,.14), transparent 70%);
+    background-attachment:fixed; color:var(--text);
+    font-family:"Vazirmatn",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:16px; line-height:1.75; padding:max(18px,env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+    max-width:560px; margin:0 auto; overflow-x:hidden;
+  }
+  .card{background:var(--card); backdrop-filter:blur(16px); border:1px solid var(--border);
+        box-shadow:var(--glow); border-radius:18px; padding:16px; margin-bottom:14px}
+  h1{font-size:19px; line-height:1.6; margin-bottom:6px}
+  h2{font-size:15px; margin-bottom:10px; color:var(--accent)}
+  .sub{color:var(--hint); font-size:13px}
+  .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+  .facts span{font-size:12.5px; font-weight:700; padding:5px 10px; border-radius:999px;
+              background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.25); color:#BAE6FD}
+  .facts span.gold{background:rgba(217,119,6,.14); border-color:rgba(217,119,6,.3); color:#FCD34D}
+  ul{margin:0 10px 0 0; padding:0}
+  li{font-size:14px; margin-bottom:7px; list-style:none; position:relative; padding-right:16px; color:#E2E8F0}
+  li:before{content:""; position:absolute; right:2px; top:11px; width:6px; height:6px; border-radius:50%;
+            background:linear-gradient(135deg,var(--accent),var(--cyan))}
+  .btn{display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
+       padding:14px; border-radius:14px; border:none; font-family:inherit; font-size:15px; font-weight:800;
+       text-decoration:none; cursor:pointer; transition:transform .15s}
+  .btn:active{transform:scale(.98)}
+  .btn-main{background:linear-gradient(135deg,var(--accent),var(--cyan)); color:#06202B}
+  .btn-ghost{background:rgba(255,255,255,.08); color:var(--text); border:1px solid var(--border)}
+  label{display:block; font-size:13px; font-weight:700; margin:12px 0 6px; color:#CBD5E1}
+  input,select,textarea{width:100%; padding:12px; border-radius:12px; border:1px solid var(--border);
+       background:rgba(2,6,23,.6); color:var(--text); font-family:inherit; font-size:14.5px}
+  input:focus,select:focus,textarea:focus{outline:2px solid rgba(56,189,248,.45); border-color:transparent}
+  textarea{min-height:88px; resize:vertical}
+  .note{font-size:12.5px; color:var(--hint); margin-top:6px}
+  .msg{margin-top:12px; padding:12px; border-radius:12px; font-size:14px; display:none}
+  .msg.ok{display:block; background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.35); color:#BBF7D0}
+  .msg.err{display:block; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35); color:#FECACA}
+  code{background:rgba(2,6,23,.7); padding:3px 7px; border-radius:7px; font-size:13px; direction:ltr; display:inline-block}
+  .status-row{display:flex; justify-content:space-between; gap:10px; font-size:14px; padding:8px 0; border-bottom:1px dashed var(--border)}
+  .status-row:last-child{border-bottom:none}
+  .status-row b{color:var(--hint); font-weight:600}
+  footer{text-align:center; color:var(--hint); font-size:12.5px; margin-top:18px}
+  footer a{color:var(--accent); text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html"><span>آزمون</span></a>
+  <a href="planner.html"><span>پلنر</span></a>
+  <a href="shimidle.html"><span>شیمیدل</span></a>
+  <a href="book.html" class="on"><span>رزرو</span></a>
+</div>
+
+<div class="card">
+  <h1>الهه محمددوست</h1>
+  <p class="sub">دبیر شیمی مؤسسه عارف — مشهد</p>
+  <div class="facts">
+    <span>دانشجوی پزشکی مشهد</span>
+    <span class="gold">رتبه ۷۸۸ کنکور تجربی</span>
+    <span>دبیر شیمی مؤسسه عارف</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>چرا با من؟</h2>
+  <ul>
+    <li>رتبه ۷۸۸ کنکور تجربی و دانشجوی پزشکی مشهد — مسیری که خودم رفته‌ام.</li>
+    <li>دبیر شیمی مؤسسه عارف.</li>
+    <li>برگزاری کارگاه تخصصی محاسبات سریع (کسر تبدیل‌ها) برای بچه‌های کنکور در کانال شیمی.</li>
+    <li>پلنر و سیستم مطالعاتی هفتگی، بر پایه تجربه سال کنکور خودم.</li>
+    <li>آزمون و ابزارهای تمرینی رایگان در مینی‌اپ کانال — شیمی دهم، یازدهم و دوازدهم.</li>
+  </ul>
+  <div class="note">کانال شیمی: <a href="https://t.me/shimi_mohamaddost" style="color:var(--accent);text-decoration:none">@shimi_mohamaddost</a></div>
+</div>
+
+<div class="card">
+  <h2>ثبت‌نام کلاس</h2>
+  <p class="sub">برای هماهنگی کلاس و شرایط، مستقیم در تلگرام پیام بده.</p>
+  <div style="height:12px"></div>
+  <a class="btn btn-main" href="https://t.me/Elahe_md1383">ثبت‌نام و هماهنگی کلاس</a>
+</div>
+
+<div class="card">
+  <h2>رزرو وقت شخصی (خصوصی)</h2>
+  <p class="sub">جلسه‌ها <b>۲ ساعته</b> و خصوصی (یک نفر) برگزار می‌شود. زمان جلسه اول را تو پیشنهاد می‌دهی، من بررسی و نهایی می‌کنم و همین صفحه زمان تأییدشده را نشان می‌دهد.</p>
+
+  <form id="bookForm">
+    <label for="name">نام و نام خانوادگی</label>
+    <input id="name" name="name" required minlength="3" maxlength="40" placeholder="مثال: زهرا احمدی">
+
+    <label for="grade">پایه</label>
+    <select id="grade" name="grade" required>
+      <option value="">انتخاب کن</option>
+      <option>دهم</option>
+      <option>یازدهم</option>
+      <option>دوازدهم</option>
+      <option>فارغ‌التحصیل / پشت کنکور</option>
+    </select>
+
+    <label for="contact">آیدی یا شماره تلگرام</label>
+    <input id="contact" name="contact" required minlength="3" maxlength="40" placeholder="مثال: @username یا ۰۹۱۲۳۴۵۶۷۸۹" dir="ltr">
+
+    <label for="topic">موضوع درخواستی</label>
+    <textarea id="topic" name="topic" required minlength="3" maxlength="200" placeholder="مثال: استوکیومتری و محلول‌ها — مشکل در تبدیل‌ها"></textarea>
+
+    <label for="prefer">روز و ساعت پیشنهادی برای جلسه اول</label>
+    <input id="prefer" name="prefer" required minlength="3" maxlength="100" placeholder="مثال: پنجشنبه ۱۸ تا ۲۰">
+
+    <div style="height:14px"></div>
+    <button class="btn btn-main" type="submit" id="submitBtn">ثبت درخواست وقت</button>
+    <div class="msg" id="formMsg"></div>
+  </form>
+
+  <div id="refBox" style="display:none; margin-top:14px">
+    <div class="status-row"><b>کد پیگیری</b><span><code id="refCode"></code></span></div>
+    <div class="note">این کد را نگه دار. لینک وضعیت:
+      <a id="refLink" href="#" style="color:var(--accent);text-decoration:none">صفحه وضعیت وقت من</a>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="statusCard" style="display:none">
+  <h2>وضعیت وقت من</h2>
+  <div id="statusBody"></div>
+</div>
+
+<footer>
+  شیمی کنکور | الهه محمددوست<br>
+  <a href="https://t.me/shimi_mohamaddost">@shimi_mohamaddost</a>
+</footer>
+
+<script>
+const API = "https://shimi-chem-bot.aidinnemati09.workers.dev";
+
+// status view: book.html?ref=<code>
+const ref = new URLSearchParams(location.search).get("ref");
+if (ref) {
+  const card = document.getElementById("statusCard");
+  const box = document.getElementById("statusBody");
+  card.style.display = "block";
+  fetch(API + "/mybooking?id=" + encodeURIComponent(ref))
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok) { box.textContent = "درخواستی با این کد پیدا نشد."; return; }
+      const row = (k, v) => {
+        const div = document.createElement("div");
+        div.className = "status-row";
+        const b = document.createElement("b"); b.textContent = k;
+        const s = document.createElement("span"); s.textContent = v;
+        div.append(b, s); return div;
+      };
+      box.append(
+        row("نام", d.name),
+        row("موضوع", d.topic),
+        row("زمان پیشنهادی تو", d.prefer),
+        row("وضعیت", d.status === "confirmed" ? "تأییدشده" : "در انتظار تأیید مدرس"),
+        row("زمان نهایی جلسه", d.time || "هنوز تعیین نشده")
+      );
+    })
+    .catch(() => { box.textContent = "ارتباط برقرار نشد. بعداً دوباره امتحان کن."; });
+}
+
+const form = document.getElementById("bookForm");
+const msg = document.getElementById("formMsg");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("submitBtn");
+  const data = Object.fromEntries(new FormData(form).entries());
+  msg.className = "msg"; msg.textContent = "";
+  btn.disabled = true; btn.textContent = "در حال ارسال…";
+  try {
+    const r = await fetch(API + "/book", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || "failed");
+    msg.className = "msg ok";
+    msg.textContent = "درخواستت ثبت شد. زمان پیشنهادی‌ات بررسی می‌شود و نتیجه در همین صفحه (لینک وضعیت) دیده می‌شود.";
+    form.reset();
+    document.getElementById("refCode").textContent = d.id;
+    const link = document.getElementById("refLink");
+    link.href = "book.html?ref=" + encodeURIComponent(d.id);
+    document.getElementById("refBox").style.display = "block";
+  } catch (err) {
+    msg.className = "msg err";
+    msg.textContent = "ارسال نشد. همه فیلدها را کامل کن و دوباره امتحان کن.";
+  } finally {
+    btn.disabled = false; btn.textContent = "ثبت درخواست وقت";
+  }
+});
+</script>
+</body>
+</html>
