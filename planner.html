@@ -373,7 +373,7 @@
           <circle id="ringArc" cx="39" cy="39" r="32" fill="none" stroke="var(--accent)" stroke-width="7"
                   stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"/>
         </svg>
-        <div class="v"><b id="ringPct">۰٪</b><span>پیشرفت</span></div>
+        <div class="v"><b id="ringPct">۰٪</b><span>بخش تیک‌خورده</span></div>
       </div>
       <div class="info">
         <div class="row"><span>مطالعه کل هفته</span><b><span id="doneH">۰</span> ساعت</b></div>
@@ -600,6 +600,11 @@ function toast(m){
 }
 const dayHours = k => state.days[k].reduce((s, p) => s + Math.min(24, Math.max(0, parseFloat(en(p.hrs)) || 0)), 0);
 const totalDone = () => WEEK.reduce((s, d) => s + dayHours(d.key), 0);
+// حلقه پیشرفت فقط بخش‌های تیک‌خورده را می‌شمارد (نه ساعت تایپ‌شده)
+const tickedPct = () => {
+  const all = WEEK.flatMap(d => state.days[d.key] || []);
+  return all.length ? Math.round(all.filter(s => s.done).length / all.length * 100) : 0;
+};
 
 let active = WEEK.find(d => d.isToday) ? WEEK.find(d => d.isToday).key : WEEK[0].key;
 
@@ -671,7 +676,7 @@ function renderParts() {
 function renderHero() {
   const done = totalDone();
   const tgt  = Math.max(1, state.target || 30);
-  const pct  = Math.max(0, Math.min(100, Math.round((done / tgt) * 100)));
+  const pct  = Math.max(0, Math.min(100, tickedPct()));
   const C    = 2 * Math.PI * 32;
   const arc  = document.getElementById("ringArc");
   arc.style.strokeDashoffset = C - (pct / 100) * C;
