@@ -170,6 +170,93 @@ async function publishToChannel(key) {
   return await tg(method0, payload);
 }
 
+const PINNED_HUB_TEXT =
+  "🔬 <b>شیمی کنکور | الهه محمددوست</b>\n" +
+  "───────────────\n" +
+  "سلام؛ الهه محمددوست هستم (دانشجوی پزشکی مشهد • رتبه ۷۸۸).\n" +
+  "جهت دسترسی سریع به آموزش‌ها، ابزارها و کارگاه‌ها، مبحث مورد نظرتان را انتخاب کنید:\n\n" +
+  "📌 <b>فهرست دسترسی سریع به بخش‌های کلیدی کانال:</b>\n" +
+  "▫️ <b>مینی‌اپ هوشمند:</b> آزمون آنلاین + پلنر تعاملی (بدون نیاز به نصب)\n" +
+  "▫️ <b>نقشه جامع شیمی (PDF):</b> دهم، یازدهم و دوازدهم — کل کتاب در یک فایل A4\n" +
+  "▫️ <b>پلنر هفتگی (PDF):</b> برنامه مطالعاتی ۷ روزه\n" +
+  "▫️ <b>برگه طلایی (PDF):</b> جمع‌بندی تمام واکنش‌های حفظی کتاب (۱۰-۱۱-۱۲)\n" +
+  "▫️ <b>دهم:</b> جرم اتمی میانگین در ۳ ثانیه (ترازوی گشتاور)\n" +
+  "▫️ <b>دهم:</b> مولار، مولال و ppm بدون اشتباه\n" +
+  "▫️ <b>دوازدهم:</b> پیل دانیل — آند و کاتد در یک نگاه\n" +
+  "▫️ <b>دوازدهم:</b> مسائل ۳ مرحله‌ای بدون موازنه (ردپای اتم)\n" +
+  "▫️ <b>یازدهم:</b> متد کلینیکال رسم ساختار لوویس در ۵ ثانیه\n" +
+  "───────────────\n" +
+  "⚗️ <b>شیمی کنکور | الهه محمددوست</b>\n" +
+  "🩺 <i>دانشجوی پزشکی مشهد • رتبه ۷۸۸</i>\n" +
+  `🆔 ${LRM}@shimi_mohamaddost`;
+
+// ردیف‌های هاب: هر URL یک بار — هنگام همگام‌سازی با دکمه‌های موجود ادغام می‌شوند
+const PINNED_HUB_ROWS = [
+  [{"text": "🚀 ورود به مینی‌اپ شیمی (آزمون + پلنر) ↗", "url": "https://mrrooobooot.github.io/shimi-app/"}],
+  [{"text": "🧩 شیمیدل پرو — بازی حدس عنصر ↗", "url": "https://mrrooobooot.github.io/shimi-app/shimidle.html"}],
+  [
+    {"text": "📥 نقشه جامع دهم (PDF)", "url": "https://t.me/shimi_mohamaddost/56"},
+    {"text": "📥 یازدهم (PDF)", "url": "https://t.me/shimi_mohamaddost/57"},
+    {"text": "📥 دوازدهم (PDF)", "url": "https://t.me/shimi_mohamaddost/58"}
+  ],
+  [
+    {"text": "📅 پلنر هفتگی (PDF) ↗", "url": "https://t.me/shimi_mohamaddost/35"},
+    {"text": "📄 برگه طلایی واکنش‌ها (PDF) ↗", "url": "https://t.me/shimi_mohamaddost/34"}
+  ],
+  [
+    {"text": "⚛️ ایزوتوپ‌ها در ۳ ثانیه ↗", "url": "https://t.me/shimi_mohamaddost/41"},
+    {"text": "💧 مولار/مولال/ppm ↗", "url": "https://t.me/shimi_mohamaddost/42"}
+  ],
+  [
+    {"text": "🔋 پیل دانیل در یک نگاه ↗", "url": "https://t.me/shimi_mohamaddost/43"},
+    {"text": "⚡️ مسائل بدون موازنه ↗", "url": "https://t.me/shimi_mohamaddost/33"}
+  ],
+  [
+    {"text": "🧪 تکنیک لوویس بدون رسم ↗", "url": "https://t.me/shimi_mohamaddost/30"},
+    {"text": "🔬 کارگاه محاسبات ↗", "url": "https://t.me/shimi_mohamaddost/25"}
+  ],
+  [{"text": "📬 هماهنگی و ثبت‌نام کلاس ↗", "url": "https://t.me/Elahe_md1383"}]
+];
+
+/** ادغام ردیف‌های هاب با دکمه‌های موجود؛ هیچ دکمه موجودی حذف نمی‌شود. */
+export function mergeKeyboard(existingRows, hubRows) {
+  const hubUrls = new Set(hubRows.flat().map((b) => b.url));
+  const kept = (existingRows || []).filter((row) => Array.isArray(row) && row.length &&
+                                               !row.every((b) => hubUrls.has(b.url)));
+  return [...hubRows, ...kept];
+}
+
+async function pinnedMessageId() {
+  const r = await tg("getChat", {chat_id: CHANNEL_ID});
+  const pinned = r && r.ok ? (r.result.pinned_message || {}) : {};
+  return pinned.message_id || 36;
+}
+
+/**
+ * همگام‌سازی هاب پین‌شده. پیش‌فرض فقط دکمه‌ها؛ برای به‌روزرسانی متن `{text: true}`.
+ * پیام پین‌شده ممکن است photo/document باشد، پس در صورت نبود متن روی editMessageCaption می‌افتیم.
+ */
+async function syncPinnedHub({ text: alsoText = false } = {}) {
+  const chatId = CHANNEL_ID;
+  const id = await pinnedMessageId();
+  const info = await tg("getChat", {chat_id: chatId});
+  const pinned = info && info.ok ? (info.result.pinned_message || {}) : {};
+  const out = {message_id: id};
+
+  if (alsoText) {
+    const isMedia = Boolean(pinned.photo || pinned.document || pinned.video);
+    out.text = await tg(isMedia ? "editMessageCaption" : "editMessageText",
+                        isMedia ? {chat_id: chatId, message_id: id, caption: PINNED_HUB_TEXT, parse_mode: "HTML"}
+                                : {chat_id: chatId, message_id: id, text: PINNED_HUB_TEXT, parse_mode: "HTML"});
+  }
+  const merged = mergeKeyboard((pinned.reply_markup || {}).inline_keyboard, PINNED_HUB_ROWS);
+  out.keyboard = await tg("editMessageReplyMarkup",
+                          {chat_id: chatId, message_id: id, reply_markup: {inline_keyboard: merged}});
+  out.ok = Object.entries(out).every(([k, v]) => ["message_id"].includes(k) ||
+                                     (v && (v.ok || (v.description || "").includes("not modified"))));
+  return out;
+}
+
 function isAssetKey(key) { return ASSETS.hasOwnProperty(key); }
 
 function approveRejectKeyboard(key) {
@@ -481,6 +568,10 @@ export default {
       }
       // Channel audit source: Cloudflare reaches t.me even when the local network
       // cannot, so the owner never needs a VPN to inspect the channel.
+      if (url.pathname === "/sync") {
+        const r = await syncPinnedHub({text: url.searchParams.get("text") === "1"});
+        return res(JSON.stringify(r), 200);
+      }
       if (url.pathname === "/chan") {
         const r = await fetch("https://t.me/s/" + (url.searchParams.get("ch") || "shimi_mohamaddost"),
                               {headers: {"User-Agent": "Mozilla/5.0"}});
@@ -696,8 +787,12 @@ export default {
           }
         }
       } else if (text === "🔄 همگام‌سازی هاب پین‌شده" || text === "/sync") {
+        const r = await syncPinnedHub();
+        const n = ((r.keyboard || {}).result || {}).reply_markup
+          ? ((r.keyboard || {}).result || {}).reply_markup.inline_keyboard.length : 0;
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
-          text: "⚠️ همگام‌سازی هاب پین‌شده فعلاً فقط در ربات لوکال فعال است (نسخه ابری به‌زودی)."});
+          text: r.ok ? `✅ هاب پین‌شده همگام شد (پیام #${r.message_id} • ${n} ردیف دکمه)`
+                     : `⚠️ همگام‌سازی ناتمام: ${esc(JSON.stringify((r.keyboard || {}).description || ""))}`});
       } else if (text === "📅 مدیریت پلنر و آزمون" || text === "/planner") {
         await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
           reply_markup: {inline_keyboard: [[{text: "🚀 باز کردن مینی‌اپ ↗", url: "https://mrrooobooot.github.io/shimi-app/"}]]},
