@@ -479,6 +479,40 @@ export default {
         const after = await tg("getWebhookInfo", {});
         return res(JSON.stringify({healed, webhook: after}), 200);
       }
+      // Channel audit source: Cloudflare reaches t.me even when the local network
+      // cannot, so the owner never needs a VPN to inspect the channel.
+      if (url.pathname === "/chan") {
+        const r = await fetch("https://t.me/s/" + (url.searchParams.get("ch") || "shimi_mohamaddost"),
+                              {headers: {"User-Agent": "Mozilla/5.0"}});
+        const html = await r.text();
+        const posts = [];
+        const chunks = html.split(/data-post="/).slice(1);
+        for (const raw of chunks) {
+          const idm = raw.match(/^[^"]*?\/(\d+)"/);
+          if (!idm) continue;
+          const chunk = raw;
+          const textm = chunk.match(/<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/);
+          const strip = (s) => s.replace(/<br\s*\/?>/g, "\n").replace(/<[^>]+>/g, "")
+                               .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+                               .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ");
+          const buttons = [];
+          const reA = /<a class="tgme_widget_message_inline_button[^"]*"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+          const reS = /<span class="tgme_widget_message_inline_button[^"]*"[^>]*>([\s\S]*?)<\/span>/g;
+          let m;
+          while ((m = reA.exec(chunk))) buttons.push({kind: "url", text: strip(m[2]).trim(), href: m[1]});
+          while ((m = reS.exec(chunk))) buttons.push({kind: "callback", text: strip(m[1]).trim()});
+          posts.push({
+            id: parseInt(idm[1], 10),
+            text: textm ? strip(textm[1]).trim() : "",
+            has_media: /tgme_widget_message_photo_wrap|tgme_widget_message_document/.test(chunk),
+            buttons,
+          });
+        }
+        return res(JSON.stringify({fetched: r.status, html_len: html.length,
+                                   widgets: (html.match(/tgme_widget_message/g) || []).length,
+                                   count: posts.length, posts}), 200);
+      }
+
       // Send asset previews straight to the work group from the cloud, so the owner
       // never has to switch a VPN on: /preview?only=golden12_soap
       if (url.pathname === "/preview") {
@@ -537,6 +571,18 @@ export default {
       const chatId = cb.message?.chat?.id;
 
       await tg("answerCallbackQuery", {callback_query_id: cb.id});
+
+      // public file requests (📄/📅/🖼 panel buttons): anyone may tap these, so they
+      // are handled BEFORE the admin gate.
+      if (data.startsWith("file_")) {
+        const key = data.slice(5);
+        if (ASSETS[key]) {
+          await sendAsset(chatId, key);
+        } else {
+          await tg("sendMessage", {chat_id: chatId, text: "⚠️ این فایل در دسترس نیست."});
+        }
+        return res("ok", 200);
+      }
 
       if (!ADMIN_IDS.includes(fromId)) {
         await tg("sendMessage", {chat_id: chatId, text: "⛔️ فقط ادمین‌های مجاز اجازه استفاده از این دکمه را دارند."});
