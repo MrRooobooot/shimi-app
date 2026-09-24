@@ -465,8 +465,19 @@ export default {
         return res(JSON.stringify({setWebhook: r, url: target}), 200);
       }
       if (url.pathname === "/status") {
-        const r = await tg("getWebhookInfo", {});
-        return res(JSON.stringify(r), 200);
+        // Self-healing: the local polling daemon calls deleteWebhook on start, which
+        // silently kills every button in the group. Re-assert our own URL whenever
+        // /status is read so the bot can never stay deaf again.
+        const self = new URL(request.url).origin + "/";
+        const before = await tg("getWebhookInfo", {});
+        let healed = false;
+        if (before.ok && before.result.url !== self) {
+          await tg("setWebhook", {url: self, allowed_updates: ["message", "callback_query", "my_chat_member"],
+                                 secret_token: env.WEBHOOK_SECRET || undefined});
+          healed = true;
+        }
+        const after = await tg("getWebhookInfo", {});
+        return res(JSON.stringify({healed, webhook: after}), 200);
       }
       // Send asset previews straight to the work group from the cloud, so the owner
       // never has to switch a VPN on: /preview?only=golden12_soap
@@ -537,7 +548,7 @@ export default {
         if (isAssetKey(key)) {
           // Preview the exact post in the GROUP first — channel publish requires an admin's
           // explicit ✅ on the PREVIEW message (two-step, never direct publish)
-          await sendAsset(chatId, key);
+          await sendAsset(chatId, key, PUBLISH_CAPTIONS[key] || ASSETS[key].caption);
           await tg("sendMessage", {chat_id: chatId, parse_mode: "HTML",
             reply_markup: {
               inline_keyboard: [[
@@ -545,7 +556,7 @@ export default {
                 {text: "❌ انصراف", callback_data: "noop"}
               ]]
             },
-            text: `📋 <b>پیش‌نمایش پست بالا</b>\n▫️ ${ASSETS[key].caption.slice(0, 80)}\n⚠️ با تایید نهایی، پست در کانال منتشر می‌شود.`});
+            text: `📋 <b>پیش‌نمایش پست بالا</b>\n▫️ ${(PUBLISH_CAPTIONS[key] || ASSETS[key].caption).replace(/<[^>]+>/g, "").slice(0, 70)}\n⚠️ با تایید نهایی، پست در کانال منتشر می‌شود.`});
         }
       } else if (data.startsWith("pub2_")) {
         const key = data.slice(5);
