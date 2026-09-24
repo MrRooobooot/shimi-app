@@ -134,11 +134,12 @@ async function tg(method, payload) {
   return await res.json();
 }
 
-async function sendAsset(chatId, key) {
+async function sendAsset(chatId, key, caption) {
   const a = ASSETS[key];
   if (!a) return {ok: false};
   const method = a.type === "document" ? "sendDocument" : "sendPhoto";
-  const payload = {chat_id: chatId, caption: a.caption};
+  const payload = {chat_id: chatId, caption: caption || a.caption};
+  if (caption) payload.parse_mode = "HTML";
   payload[method === "sendDocument" ? "document" : "photo"] = a.url;
   return await tg(method, payload);
 }
@@ -466,6 +467,33 @@ export default {
       if (url.pathname === "/status") {
         const r = await tg("getWebhookInfo", {});
         return res(JSON.stringify(r), 200);
+      }
+      // Send asset previews straight to the work group from the cloud, so the owner
+      // never has to switch a VPN on: /preview?only=golden12_soap
+      if (url.pathname === "/preview") {
+        const only = url.searchParams.get("only") || "";
+        const clean = (url.searchParams.get("clean") || "").split(",").map((s) => parseInt(s, 10)).filter(Boolean);
+        const removed = [];
+        for (const mid of clean) {
+          const d = await tg("deleteMessage", {chat_id: GROUP_ID, message_id: mid});
+          removed.push({message_id: mid, ok: !!(d && d.ok)});
+        }
+        const keys = only ? [only] : Object.keys(ASSETS).filter((k) => k.startsWith("golden12_"));
+        const sent = [];
+        for (const k of keys) {
+          if (!ASSETS[k]) { sent.push({key: k, error: "unknown key"}); continue; }
+          const cap = PUBLISH_CAPTIONS[k] || ASSETS[k].caption;
+          const r = await sendAsset(GROUP_ID, k, cap);
+          if (!r || r.ok === false) { sent.push({key: k, error: (r && r.description) || "send failed"}); continue; }
+          const mid = r.result && r.result.message_id;
+          const rev = await tg("sendMessage", {
+            chat_id: GROUP_ID, parse_mode: "HTML", reply_markup: approveRejectKeyboard(k),
+            text: `📋 <b>بررسی و تایید انتشار برگه طلایی:</b>\n▫️ ${cap.replace(/<[^>]+>/g, "").slice(0, 70)}`,
+          });
+          sent.push({key: k, message_id: mid, review_id: rev.result && rev.result.message_id,
+                     caption_len: cap.length, public_caption: !!PUBLISH_CAPTIONS[k]});
+        }
+        return res(JSON.stringify({ok: true, removed, sent}), 200);
       }
     }
 
