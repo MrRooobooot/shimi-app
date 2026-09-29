@@ -135,7 +135,7 @@ def build_html() -> str:
 </body></html>'''
 
 def main():
-    out_dir = "/Users/aidin/shimi_channel_backup"
+    out_dir = "/Users/aidin/shimi_channel_backup/assets/golden-sheets"
     html_path = "/tmp/golden_acids.html"
     pdf_path = f"{out_dir}/golden_sheet_acids_bases.pdf"
 

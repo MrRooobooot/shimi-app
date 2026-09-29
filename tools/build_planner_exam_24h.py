@@ -150,7 +150,7 @@ def build_html() -> str:
 </body></html>'''
 
 def main():
-    out_dir = "/Users/aidin/shimi_channel_backup"
+    out_dir = "/Users/aidin/shimi_channel_backup/assets/planners"
     html_path = "/tmp/planner_exam.html"
     pdf_path = f"{out_dir}/planner_exam_24h.pdf"
     html = build_html()

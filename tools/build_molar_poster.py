@@ -182,7 +182,7 @@ def build_html() -> str:
 </html>'''
 
 def main():
-    out_dir = "/Users/aidin/shimi_channel_backup"
+    out_dir = "/Users/aidin/shimi_channel_backup/assets/posters"
     html_path = "/tmp/molar_poster.html"
     png_path = f"{out_dir}/poster_molar_concentration.png"
     html = build_html()

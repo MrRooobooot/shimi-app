@@ -238,7 +238,7 @@ def build_html() -> str:
 
 def main():
     html_path = "/tmp/isotope_poster.html"
-    png_path = "/Users/aidin/shimi_channel_backup/poster_isotopes_grade10.png"
+    png_path = "/Users/aidin/shimi_channel_backup/assets/posters/poster_isotopes_grade10.png"
     html = build_html()
 
     leftovers = audit_emoji_icons(html)

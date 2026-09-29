@@ -141,7 +141,7 @@ def build_html() -> str:
 
 
 def main():
-    out_dir = "/Users/aidin/shimi_channel_backup"
+    out_dir = "/Users/aidin/shimi_channel_backup/assets/golden-sheets"
     html_path = "/tmp/golden.html"
     pdf_path = f"{out_dir}/golden_reactions_10_11_12.pdf"
 
