@@ -236,7 +236,7 @@ async function pinnedMessageId() {
  * همگام‌سازی هاب پین‌شده. پیش‌فرض فقط دکمه‌ها؛ برای به‌روزرسانی متن `{text: true}`.
  * پیام پین‌شده ممکن است photo/document باشد، پس در صورت نبود متن روی editMessageCaption می‌افتیم.
  */
-async function syncPinnedHub({ text: alsoText = false } = {}) {
+async function syncPinnedHub({ text: alsoText = false, dry = false } = {}) {
   const chatId = CHANNEL_ID;
   const id = await pinnedMessageId();
   const info = await tg("getChat", {chat_id: chatId});
@@ -250,6 +250,8 @@ async function syncPinnedHub({ text: alsoText = false } = {}) {
                                 : {chat_id: chatId, message_id: id, text: PINNED_HUB_TEXT, parse_mode: "HTML"});
   }
   const merged = mergeKeyboard((pinned.reply_markup || {}).inline_keyboard, PINNED_HUB_ROWS);
+  if (dry) return {dry: true, message_id: id, rows: merged.length,
+                   labels: merged.map((r) => r.map((b) => b.text)), is_media: Boolean(pinned.photo || pinned.document)};
   out.keyboard = await tg("editMessageReplyMarkup",
                           {chat_id: chatId, message_id: id, reply_markup: {inline_keyboard: merged}});
   out.ok = Object.entries(out).every(([k, v]) => ["message_id"].includes(k) ||
@@ -569,7 +571,8 @@ export default {
       // Channel audit source: Cloudflare reaches t.me even when the local network
       // cannot, so the owner never needs a VPN to inspect the channel.
       if (url.pathname === "/sync") {
-        const r = await syncPinnedHub({text: url.searchParams.get("text") === "1"});
+        const r = await syncPinnedHub({text: url.searchParams.get("text") === "1",
+                                       dry: url.searchParams.get("dry") === "1"});
         return res(JSON.stringify(r), 200);
       }
       if (url.pathname === "/chan") {
